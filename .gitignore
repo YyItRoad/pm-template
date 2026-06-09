@@ -1,0 +1,28 @@
+# 模板仓库的 .gitignore 占位
+# 实际项目("Use this template" 后)按需扩展
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Node
+node_modules/
+dist/
+dist-app/
+.vite/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

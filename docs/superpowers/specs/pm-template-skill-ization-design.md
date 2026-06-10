@@ -289,6 +289,59 @@ def update_state(phase: int, new_status: str, **kwargs):
 
 混在"phase X 未通过"里,用户不知道该 unlock 1 还是 unlock 2。
 
+### 4.5 第二层状态机:变更日志(`/change` 入口)
+
+5 phase 锁完后,项目进入维护期。对已存在项目做修改的入口是 **`/change <type> <name>`**,与 5 phase **独立**的第二层状态机。
+
+**为什么独立**:变更频繁 + 类型差异大(feature 重 / hotfix 轻)+ 不应 cascade 重跑基础 phase。如果沿用 5 phase 状态机,加 1 个 feature 得 unlock phase 1/2/3/4 全套,代价过大。
+
+**5 个 type**(已实现):
+
+| type | 严格度 | 签字 | 模板 | critic | DoD |
+|---|---|---|---|---|---|
+| feature | 重(10 项) | 1 + 1 reviewer | `change/feature.md` | `critics/change/feature.md` | `dod/change/feature.md` |
+| bugfix | 中(6 项) | 1 人 | `change/bugfix.md` | `critics/change/bugfix.md` | `dod/change/bugfix.md` |
+| refactor | 中(7 项) | 1 + 1 reviewer | `change/refactor.md` | `critics/change/refactor.md` | `dod/change/refactor.md` |
+| hotfix | 极轻(4 项) | 1 人 | `change/hotfix.md` | `critics/change/hotfix.md` | `dod/change/hotfix.md` |
+| doc | 轻(3 项) | 1 人 | `change/doc.md` | `critics/change/doc.md` | `dod/change/doc.md` |
+
+**未实现的 type**(优先级中,触发才扩展):upgrade / perf / migration / deprecation,详见 `docs/process/TODO.md` §1。
+
+**变更日志状态机**(与 5 phase 完全独立):
+
+```
+[ ] ──→ [~] ──→ [x]      (正常完成)
+              ↘
+               [DEPRECATED]   (被新方案替代 / 项目重写)
+               [ABORTED]      (讨论后取消)
+```
+
+| 状态 | 谁能改 | 含义 |
+|---|---|---|
+| `[ ]` | 起草人 | 已分配号,未填 |
+| `[~]` | 起草人 | 填写中 |
+| `[x]` | reviewer(或操作者) | 已签字(代码已合并) |
+| `[DEPRECATED]` | 任何 reviewer | 弃用 |
+| `[ABORTED]` | 起草人 | 取消 |
+
+**编号规则**:
+- NNNN 4 位 0 补,单调递增
+- 废弃号(DEPRECATED / ABORTED)不重用
+- 系统自动分配,避免人为手写出错
+
+**与 5 phase 状态机的关系**:
+- **不重审 5 phase 产物**:已锁 = 已锁
+- **不修改 5 phase 文档**:变更 spec 只**引用** phase 文档,不**修改**
+- **不在 5 phase 状态机里加变更状态**:避免状态机爆炸(5 phase × 5 状态 + 5 变更 × 3 状态 = 不可读)
+
+**变更 → 5 phase 增量**:变更 [x] 后,user 在对应 phase 文档里**追加**新故事 / 新接口 / 新表(增量),旧内容**不动**。这是手工追加,不是 skill 强制的——若需要强制度,见 TODO §3。
+
+**跨切面**:
+- **ADR**:`/decision <title>` 写 `docs/decisions/NNNN-<title>.md`,贯穿项目全程(不是一次性事件)
+- **Release log**:变更 [x] 后,在 `docs/releases.md` 追加一行(轻量手工)
+
+详见 `docs/process/TODO.md` 与 `.claude/skills/change.md`。
+
 ---
 
 ## 五、资产映射

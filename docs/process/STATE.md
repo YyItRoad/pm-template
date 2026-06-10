@@ -39,3 +39,23 @@
 - 状态: [ ]
 - 追溯证据: `<test/e2e 报告路径>`
 - 签字:
+
+## 变更日志(★ /change 入口)
+
+> 状态:[ ] 未开始 / [~] 进行中 / [x] 已锁 / [DEPRECATED] / [ABORTED]
+> 本段独立于 5 phase 状态机,由 `/change <type> <name>` 入口维护。
+> 详见 `.claude/skills/change.md` 与 `docs/process/TODO.md`。
+> 编号 NNNN 由 /change 自动分配(单调递增,废弃号不重用)。
+
+| # | type | 名称 | 状态 | 加于 | 签字 | 关联 |
+|---|---|---|---|---|---|---|
+| (暂无变更) | | | | | | |
+
+## 决策日志(ADR)
+
+> 状态:proposed / accepted / deprecated / superseded
+> 详见 `docs/process/templates/decision.md`。
+
+| # | 标题 | 状态 | 加于 | 签字 |
+|---|---|---|---|---|
+| (暂无决策) | | | | |

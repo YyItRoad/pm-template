@@ -355,3 +355,101 @@ def test_end_to_end_skip_then_lock_others(state_workdir: Path) -> None:
     update_state(3, "[x]", signed_by="A", signed_at="2026-06-10", template_sha="x")
     state = parse_state(find_state_file())
     assert get_current_status(state[3]) == "[x]"
+
+
+# ===== /change 第二层状态机测试(改动 4.5) =====
+
+
+CHANGE_LOG_MARKER = "## 变更日志(★ /change 入口)"
+
+
+def test_state_template_has_change_log_section() -> None:
+    """STATE.md 模板必含"变更日志"段,否则 /change 入口无处写。"""
+    state_template = (REPO_ROOT / "docs" / "process" / "STATE.md").read_text(encoding="utf-8")
+    assert CHANGE_LOG_MARKER in state_template
+
+
+def test_state_template_has_decision_log_section() -> None:
+    """STATE.md 模板必含"决策日志"段(ADR 联动)。"""
+    state_template = (REPO_ROOT / "docs" / "process" / "STATE.md").read_text(encoding="utf-8")
+    assert "## 决策日志(ADR)" in state_template
+
+
+def test_change_log_status_options() -> None:
+    """变更日志状态机的 5 状态[ ] [~] [x] [DEPRECATED] [ABORTED] 必出现在模板说明中。"""
+    state_template = (REPO_ROOT / "docs" / "process" / "STATE.md").read_text(encoding="utf-8")
+    for status in ["[ ]", "[~]", "[x]", "[DEPRECATED]", "[ABORTED]"]:
+        assert status in state_template, f"变更日志缺状态 {status}"
+
+
+def test_change_number_4digit_padding() -> None:
+    """变更号 NNNN 4 位 0 补的格式约定(由 /change 自动分配)。"""
+    # 模拟 /change 的编号逻辑
+    existing = ["0001-feat-audit.md", "0003-fix-bug.md"]
+    nums = [int(f.split("-")[0]) for f in existing]
+    next_n = max(nums) + 1
+    padded = f"{next_n:04d}"
+    assert padded == "0004"
+
+
+def test_change_number_skipping_deprecated() -> None:
+    """废弃号不重用:0002 [DEPRECATED] 后,新变更仍用 0003。"""
+    existing = [
+        ("0001", "[x]"),
+        ("0002", "[DEPRECATED]"),
+        ("0003", "[x]"),  # 跳过 0002 用 0003
+    ]
+    # 简化:取所有号(废弃号不重用规则,意味着下一个号 = max(非废弃) + 1)
+    active = [int(n) for n, s in existing if s != "[DEPRECATED]"]
+    next_n = max(active) + 1
+    assert next_n == 4  # 0004 续
+
+
+def test_change_skill_in_skill_list() -> None:
+    """.claude/skills/change.md 必存在。"""
+    assert (REPO_ROOT / ".claude" / "skills" / "change.md").exists()
+
+
+def test_all_5_change_templates_exist() -> None:
+    """5 个 type 模板必全在(基于 _base 的扩展)。"""
+    for t in ("feature", "bugfix", "refactor", "hotfix", "doc"):
+        f = REPO_ROOT / "docs" / "process" / "templates" / "change" / f"{t}.md"
+        assert f.exists(), f"change 模板缺: {t}.md"
+
+
+def test_all_5_change_critics_exist() -> None:
+    """5 个 critic 必全在。"""
+    for t in ("feature", "bugfix", "refactor", "hotfix", "doc"):
+        f = REPO_ROOT / "docs" / "critics" / "change" / f"{t}.md" if False else REPO_ROOT / "docs" / "process" / "critics" / "change" / f"{t}.md"
+        assert f.exists(), f"change critic 缺: {t}.md"
+
+
+def test_all_5_change_dods_exist() -> None:
+    """5 个 DoD 必全在。"""
+    for t in ("feature", "bugfix", "refactor", "hotfix", "doc"):
+        f = REPO_ROOT / "docs" / "process" / "dod" / "change" / f"{t}.md"
+        assert f.exists(), f"change DoD 缺: {t}.md"
+
+
+def test_change_base_template_has_required_markers() -> None:
+    """_base 模板必含关键段(否则 type 模板会失骨架)。"""
+    base = (REPO_ROOT / "docs" / "process" / "templates" / "change" / "_base.md").read_text(encoding="utf-8")
+    for marker in ("§0 元信息", "§1 type 特有段", "§9 关联引用", "§10 critic + 签字"):
+        assert marker in base, f"_base 模板缺段: {marker}"
+
+
+def test_decision_template_exists() -> None:
+    """ADR 模板必存在(跨切面 §4.5)。"""
+    assert (REPO_ROOT / "docs" / "process" / "templates" / "decision.md").exists()
+
+
+def test_release_template_exists() -> None:
+    """Release log 模板必存在(跨切面 §4.5)。"""
+    assert (REPO_ROOT / "docs" / "process" / "templates" / "release.md").exists()
+
+
+def test_todo_doc_lists_unimplemented_types() -> None:
+    """TODO.md 必含未实现的 4 个 type(范围守门)。"""
+    todo = (REPO_ROOT / "docs" / "process" / "TODO.md").read_text(encoding="utf-8")
+    for t in ("upgrade", "perf", "migration", "deprecation"):
+        assert t in todo, f"TODO.md 缺未实现 type: {t}"

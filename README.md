@@ -28,6 +28,23 @@ pm-template 是一个**可复用资产仓库**,为 **web 应用(后端业务层 
 3. **Phase 0 签字**: 填 `docs/00_charter.md` §2.5,引用 [`docs/process/tech_stack.md`](docs/process/tech_stack.md) 选标准栈
 4. **走完 5 phase**: 每 phase 完成 → 跑 critic → 勾 DoD → 签字 → 锁
 
+## 维护期:加功能 / 修 bug / 重构
+
+5 phase 锁完后,进入维护期。对已存在项目做修改用 **`/change <type> <name>`** 入口:
+
+```bash
+/change feature audit-log         # 加功能
+/change bugfix login-401          # 修 bug
+/change refactor service-layer    # 重构
+/change hotfix db-deadlock        # 紧急修复
+/change doc readme-typo           # 文档
+```
+
+5 个常用 type 已落地(feature / bugfix / refactor / hotfix / doc)。
+其他 type(upgrade / perf / migration / deprecation)与生命周期场景(sunset / handoff / audit)见 [`docs/process/TODO.md`](docs/process/TODO.md)。
+
+变更 spec 独立于 5 phase 状态机,详见 spec §4.5。
+
 ## 适用
 
 | ✅ 适用 | ❌ 不适用 |

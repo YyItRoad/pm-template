@@ -34,6 +34,29 @@ Phase 1 不是 `[x]` → 报 `ERR_PHASE_LOCKED_BY_UPSTREAM`。
 
 **b) 本 phase 状态 + 版本对齐**:同 Phase 1。
 
+**c) Phase 1 完整性硬 grep**(改动 5,★关键,失败 = exit 不继续):
+
+```bash
+# Phase 1 §0 挖掘证据必含 4 个 anchor,缺 = ERR_PHASE_1_INCOMPLETE
+# 失败后**强制回 phase 1 unlock 补**,不是 phase 2 内部修
+REQUIRED_ANCHORS=("role-scenario" "edge-scenarios" "exception-paths" "reverse-requirements")
+MISSING=()
+for anchor in "${REQUIRED_ANCHORS[@]}"; do
+  if ! grep -q "<!-- ANCHOR: $anchor -->" docs/01_requirements.md 2>/dev/null; then
+    MISSING+=("$anchor")
+  fi
+done
+if [ ${#MISSING[@]} -gt 0 ]; then
+  echo "ERR_PHASE_1_INCOMPLETE: 01_requirements.md 缺 anchor: ${MISSING[*]}"
+  echo "→ 请先 /unlock 1 回到 phase 1 补挖掘证据,再回 phase 2"
+  exit 1
+fi
+```
+
+**为什么硬 grep**:LLM 写 phase 2 时,会"凭记忆"假装知道 phase 1 的内容。
+硬 grep 强制 phase 1 真的写了 §0。这是"5 类门"里的第 5 类(硬 grep 门),
+区别于 critic 主观打分。
+
 ### 2. 标记 in-progress(可选)
 
 ```bash

@@ -39,6 +39,35 @@ Phase 2 不是 `[x]` → 报 `ERR_PHASE_LOCKED_BY_UPSTREAM`。
 
 **b) 本 phase 状态 + 版本对齐**:同前。
 
+**c) Phase 1 + 2 完整性硬 grep**(改动 5,★关键,失败 = exit 不继续):
+
+```bash
+# Phase 1:4 anchor 必在 01_requirements.md
+REQUIRED_ANCHORS_1=("role-scenario" "edge-scenarios" "exception-paths" "reverse-requirements")
+MISSING=()
+for anchor in "${REQUIRED_ANCHORS_1[@]}"; do
+  if ! grep -q "<!-- ANCHOR: $anchor -->" docs/01_requirements.md 2>/dev/null; then
+    MISSING+=("01:$anchor")
+  fi
+done
+
+# Phase 2:02_high_level_design.md 必含"## 3. 接口清单"段
+if ! test -s docs/02_high_level_design.md; then
+  MISSING+=("02:file-missing")
+elif ! grep -q "^## 3\. " docs/02_high_level_design.md; then
+  MISSING+=("02:no-interface-list")
+fi
+
+if [ ${#MISSING[@]} -gt 0 ]; then
+  echo "ERR_UPSTREAM_INCOMPLETE: ${MISSING[*]}"
+  echo "→ 请先 /unlock 对应 phase 补产物,再回 phase 3"
+  exit 1
+fi
+```
+
+**为什么硬 grep**:phase 3 写 03a/3b/3c 时,如果 phase 1 没挖够或 phase 2 接口清单
+没写,LLM 会"凭记忆"写一堆没依据的接口。硬 grep 强制上游真有证据。
+
 ### 2. 标记 in-progress
 
 ```bash

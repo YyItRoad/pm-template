@@ -36,6 +36,52 @@ description: 按 03b 接口 + 03c 表 + 01 故事 + AC 写代码 + e2e,跑 criti
 
 **b) 本 phase 状态 + 版本对齐**:同前。
 
+**c) Phase 1 + 2 + 3 完整性硬 grep**(改动 5,★关键,失败 = exit 不继续):
+
+```bash
+# Phase 1:4 anchor 必在 01_requirements.md
+REQUIRED_ANCHORS_1=("role-scenario" "edge-scenarios" "exception-paths" "reverse-requirements")
+MISSING=()
+for anchor in "${REQUIRED_ANCHORS_1[@]}"; do
+  if ! grep -q "<!-- ANCHOR: $anchor -->" docs/01_requirements.md 2>/dev/null; then
+    MISSING+=("01:$anchor")
+  fi
+done
+
+# Phase 2:02_high_level_design.md 必含"## 3. 接口清单"
+if ! grep -q "^## 3\. " docs/02_high_level_design.md 2>/dev/null; then
+  MISSING+=("02:no-interface-list")
+fi
+
+# Phase 3:03a/03b/03c 必存在 + 非空
+for f in docs/03a_business_process.md docs/03b_api_design.md docs/03c_data_schema.md; do
+  if ! test -s "$f"; then
+    MISSING+=("03:$f-missing-or-empty")
+  fi
+done
+
+# Phase 3 必填 anchor 检查(03a/3b/3c)
+for anchor_check in "03a:process-1-normal" "03a:process-1-exception" "03b:api-list" "03c:tables"; do
+  file="docs/03${anchor_check%%:*}_${anchor_check##*:}.md"
+  # 注:实际 file 名映射略,这里示意逻辑
+  if ! grep -q "<!-- ANCHOR: ${anchor_check##*:} -->" "$file" 2>/dev/null; then
+    MISSING+=("03:anchor-${anchor_check}")
+  fi
+done
+
+if [ ${#MISSING[@]} -gt 0 ]; then
+  echo "ERR_UPSTREAM_INCOMPLETE: ${MISSING[*]}"
+  echo "→ 请先 /unlock 对应 phase 补产物,再回 phase 4"
+  exit 1
+fi
+```
+
+**为什么硬 grep**:phase 4 是写代码,如果上游任何一个 phase 产物缺失或 anchor
+没填,LLM 实现时会"凭想象"写无依据代码。硬 grep 强制上游真有合同。
+
+> **注**:03a/3b/3c 的 anchor 检查需根据实际 file 名映射(03a process-1-normal 对应
+> docs/03a_business_process.md,等等),实现时按需调整 grep 路径。
+
 ### 2. 标记 in-progress
 
 ```bash

@@ -202,7 +202,7 @@ Claude Code 会话
 - 任何"跳级"如 `[ ] → [UNLOCKED]`
 
 **特殊状态**:
-- `[x] LEGACY`:试点项目专用(如 KidBudget 的历史 phase),**只能由 migration 脚本**(在 pm-template 仓库内提供)写入。skill 9 个均无权限设 LEGACY。这是"只读历史包袱"。
+- `[x] LEGACY`:试点项目专用(如旧项目的历史 phase),**只能由 migration 脚本**(在 pm-template 仓库内提供)写入。skill 9 个均无权限设 LEGACY。这是"只读历史包袱"。
 
 ### 4.2 唯一写 STATE.md 的 helper
 

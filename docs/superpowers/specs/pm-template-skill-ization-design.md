@@ -420,10 +420,10 @@ pm-template/                           ← 现有结构不变
 **例**:
 ```
 > [y] 锁
-> 请输入签字人姓名: Alice
+> 请输入签字人姓名: <name>
 > 请输入签字日期(YYYY-MM-DD,回车默认今天): [回车]
-> 签字: Alice 2026-06-10
-> update_state(0, '[x]', signed_by='Alice', signed_at='2026-06-10', ...) ✓
+> 签字: <name> YYYY-MM-DD
+> update_state(0, '[x]', signed_by='<name>', signed_at='YYYY-MM-DD', ...) ✓
 ```
 
 ---

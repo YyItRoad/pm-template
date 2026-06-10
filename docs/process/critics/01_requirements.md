@@ -41,6 +41,19 @@
 9. **决策记录**
    - §6 ≥1 条?
 
+10. **§0 挖掘证据完整性**(机械 grep,新加,**最关键的一项**)
+    - 4 个 anchor 必命中:
+      - `<!-- ANCHOR: role-scenario -->`
+      - `<!-- ANCHOR: edge-scenarios -->`
+      - `<!-- ANCHOR: exception-paths -->`
+      - `<!-- ANCHOR: reverse-requirements -->`
+    - 任意缺失 = **CRITICAL**
+    - 表格行数:边界场景 ≥20 / 异常路径 ≥10 / 反向需求 ≥10
+    - 不达标 = **CRITICAL**
+    - **理由**:这是 phase 2 启动时的硬 grep 目标,缺 = phase 2 拒绝启动
+    - 反向需求特别重要:phase 4 critic 用来 grep "系统不应做 X" 应 0 命中,这条是反作弊的根
+    - 抽查 3 条验证:内容是否真的从 §1-§6 提炼(防"凭空白想")
+
 ## 输出格式
 
 - markdown 报告

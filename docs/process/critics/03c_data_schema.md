@@ -41,6 +41,11 @@
    - utf8mb4 + InnoDB + snake_case + DECIMAL(10,2) 全部满足?
    - 任一不满足 = HIGH
 
+9. **必填槽位(机械 grep,新加)**
+   - grep `<!-- ANCHOR: tables -->` 必命中
+   - 必含表注释 / 字段类型 / 索引意图 三栏(任一缺 = HIGH)
+   - 抽查 1 张表:三栏是否都填了(防"挂 anchor 留空")
+
 ## 输出格式
 
 - markdown 报告

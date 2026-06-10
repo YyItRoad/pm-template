@@ -27,6 +27,11 @@
    - 流程图里引入了 Phase 1/2 没出现的能力?
    - 实际 grep 流程小节标题,跟 Phase 2 §3 求差集
 
+6. **必填槽位(机械 grep,新加)**
+   - 每个流程必含 2 个 anchor:`<!-- ANCHOR: process-N-normal -->` 和 `<!-- ANCHOR: process-N-exception -->`(N 是流程编号)
+   - 任意 anchor 缺失 = **HIGH**(必填段漏标,phase 4 实现时找不到"正常/异常"对照)
+   - 抽查 1 个流程:正常流程和异常分支是否真的都写了(防"挂 anchor 写空")
+
 ## 输出格式
 
 - markdown 报告

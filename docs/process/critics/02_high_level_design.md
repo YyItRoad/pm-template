@@ -39,6 +39,12 @@
    - 若偏离,Phase 0 §2.5 是否已签字
    - 偏离未签字 = CRITICAL(擅自引入新栈)
 
+9. **Phase 1 完整性硬门(交叉检查,新加)**
+   - grep `01_requirements.md` 必含 4 个 anchor:`role-scenario` / `edge-scenarios` / `exception-paths` / `reverse-requirements`
+   - 任意缺失 → **报告本条为 CRITICAL**,并标注"ERR_PHASE_1_INCOMPLETE:回 phase 1 unlock 补挖掘证据"
+   - **本检查由 phase 2 skill 启动时也跑一次(改动 5)**,critic 跑时是双保险
+   - **理由**:phase 2 启动时如果 phase 1 没挖够,继续设计就是 GIGO
+
 ## 输出格式
 
 - markdown 报告

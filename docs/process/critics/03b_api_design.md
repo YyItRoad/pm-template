@@ -35,6 +35,11 @@
    - 接口路径名有没有引入 Phase 1 故事没出现的能力(检查 path keyword)
    - 例:`/admin/...` path 在 Phase 1 没出现 = CRITICAL
 
+8. **必填槽位(机械 grep,新加)**
+   - grep `<!-- ANCHOR: api-list -->` 必命中
+   - 接口清单表的列必含:接口 ID / 方法 / 路径 / 鉴权 / 请求体 / 响应体 / 错误码(7 列,缺一 = HIGH)
+   - 抽查 1 个接口:7 列是否都填了(防"挂 anchor 列留空")
+
 ## 输出格式
 
 - markdown 报告

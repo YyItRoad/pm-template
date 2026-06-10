@@ -4,6 +4,7 @@
 > 输入: 来自 Phase 1 需求(每项接口必须能追溯到 S-XX)
 > 产出: 概要设计,Phase 3 详细设计的输入
 > 禁止: 不写 DDL 详细类型(那是 Phase 3c),不写代码
+> 技术选型遵循 [`docs/process/tech_stack.md`](../tech_stack.md) §2-§5 锁级;偏离项须在 `docs/00_charter.md` §2.5 签字。
 
 ## 1. 架构视图
 

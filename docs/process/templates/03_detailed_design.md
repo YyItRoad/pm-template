@@ -11,6 +11,7 @@
 
 ## §A. 详细业务流程 → `docs/03a_business_process.md`
 
+> 命名 / 锁层级遵循 [`docs/process/tech_stack.md` §3 §4](../tech_stack.md)。
 > 每条流程的"正常 + 异常"配对齐全,涉及金额的标注"同事务内联动 balance"
 
 ### A.1 [流程名,如"创建收入记录"]
@@ -31,6 +32,7 @@
 
 ## §B. 详细接口设计 → `docs/03b_api_design.md`
 
+> 命名 / 接口风格遵循 [`docs/process/tech_stack.md` §3 §4](../tech_stack.md)。
 > 接口清单 = Phase 2 §3 的 100%(不多不少)
 > 每个接口 4 列必填:鉴权依赖 / 错误码清单 / 幂等策略 / 限频策略
 > 入参"最小集",多一个冗余字段扣分
@@ -53,6 +55,7 @@
 
 ## §C. 数据表 DDL → `docs/03c_data_schema.md` + `sql/*_schema.sql`
 
+> 命名 / 字段类型 / 字符集遵循 [`docs/process/tech_stack.md` §2.3 §3](../tech_stack.md)。
 > DDL 可直接执行(放进 sql/ 跑一遍)
 > 字段命名 100% 对齐 charter §3 规范,不用 admin_user_id 之类的别名
 > 不引入 Phase 2 §2 数据模型之外的新表

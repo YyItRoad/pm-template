@@ -1,6 +1,6 @@
 ---
 name: phase-3-detail
-description: 拉 docs/process/templates/03_detailed_design.md 模板,引导用户拆 3a 业务流程 + 3b API 接口 + 3c 数据表 DDL,跑 3 次 critic,sign-off 后调 update_state 锁 [x] Phase 3。
+description: 拉 docs/process/templates/03_detailed_design.md 模板(段标 [必填]/[可选] 标记),引导用户拆 3a 业务流程 + 3b API 接口 + 3c 数据表 DDL,跑 3 次 critic,sign-off 后调 update_state 锁 [x] Phase 3。
 ---
 
 # /phase-3-detail — 详细设计
@@ -49,12 +49,13 @@ python3 .claude/scripts/update_state.py --phase 3 --status "[~]"
 
 **Phase 3 与 0/1/2 不同**:3 个子产物**串行填写 + 串行 critic**(避免"3a 改了 3c 还没填"的混乱)。
 
-#### 3a 业务流程
+#### 3a 业务流程 [必填]
 
 读 `docs/process/critics/03a_business_process.md` 看检查项,引导写 `docs/03a_business_process.md`:
 - 状态机(每个核心实体,如 Budget / Apply)
 - 时序图(关键场景,如"孩子申请 → 父母审批 → 余额变化")
 - 异常路径(余额不足 / 重复申请 / 状态非法)
+- **每个流程必含 2 个 anchor**:`<!-- ANCHOR: process-N-normal -->` 和 `<!-- ANCHOR: process-N-exception -->`(N 是流程编号),缺一 = HIGH
 
 填完跑:
 ```bash
@@ -63,28 +64,37 @@ python3 .claude/scripts/update_state.py --phase 3 --status "[~]"
 
 CRITICAL/HIGH → 停下等改。MEDIUM → 提示但可继续。
 
-#### 3b API 接口
+#### 3b API 接口 [必填]
 
 读 `docs/process/critics/03b_api_design.md`,引导写 `docs/03b_api_design.md`:
 - 完整 path / method / 入参 JSON Schema / 出参 JSON Schema / 错误码表
 - 每个接口对应 Phase 1 AC 编号(便于 Phase 4 critic 做 AC 覆盖)
 - 接口分组(webhook / 管理端 / 内部)
+- **必含 anchor** `<!-- ANCHOR: api-list -->`,接口清单 7 列必填(ID/方法/路径/鉴权/请求体/响应体/错误码),缺列 = HIGH
 
 填完跑:
 ```bash
 /critic 3b
 ```
 
-#### 3c 数据表
+#### 3c 数据表 [必填]
 
 读 `docs/process/critics/03c_data_schema.md`(已在会话上下文),引导写:
 - `docs/03c_data_schema.md`(设计说明:实体关系 + 索引意图)
 - `sql/schema.sql` 或 `sql/migrations/V00N__*.sql`(可执行 DDL)
+- **必含 anchor** `<!-- ANCHOR: tables -->`,表注释/字段类型/索引意图 三栏必填,缺 = HIGH
 
 填完跑:
 ```bash
 /critic 3c
 ```
+
+#### 3 附录(可选)
+
+- 附录 A: 性能 / 容量基线 [可选] —— 简单项目可跳(整段不写)
+- 附录 B: 安全 / 合规检查点 [可选] —— 同上
+
+**挂了标题但内容是占位符 = `ERR_OPTIONAL_SECTION_FILLED_BUT_BLANK`**,提示"删标题 / 写内容"二选一。
 
 **Phase 3c critic 重点**:
 - DDL 可执行性(`mysql < schema.sql` 无语法错误)
@@ -140,6 +150,8 @@ python3 .claude/scripts/update_state.py \
 
 | 错误 | 行为 |
 |---|---|
+| `ERR_PHASE_1_INCOMPLETE` | phase 1 挖掘证据不全(改动 5 硬 grep),**回 phase 1 unlock 补** |
+| `ERR_OPTIONAL_SECTION_FILLED_BUT_BLANK` | 附录 A/B 挂了标题但内容是占位符,提示"删标题 / 写内容"二选一 |
 | Phase 2 未锁 | 报 `ERR_PHASE_LOCKED_BY_UPSTREAM` |
 | Phase 3 是 `[x]` | 报"已锁,需先 unlock" |
 | 3c DDL 语法错 | critic CRITICAL,贴 SQL 片段 |
@@ -148,6 +160,8 @@ python3 .claude/scripts/update_state.py \
 
 ## 不要做的
 
+- **不绕过 3a/3b/3c 必填段** —— §A/§B/§C 各子项不可漏
+- **不绕过附录 A/B [可选] 的二选一** —— 挂标题空内容 = ERR_OPTIONAL_SECTION_FILLED_BUT_BLANK
 - 不在 3c 加新实体(必须先回 Phase 2 加)
 - 不在 3b 加新接口方向(必须先回 Phase 2)
 - 不在 3a 加 Phase 1 §5 反向需求里"不做"的状态

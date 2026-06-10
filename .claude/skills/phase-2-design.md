@@ -1,6 +1,6 @@
 ---
 name: phase-2-design
-description: 拉 docs/process/templates/02_high_level_design.md 模板,引导用户写架构/数据/接口清单,跑 DoD + critic,sign-off 后调 update_state 锁 [x] Phase 2。
+description: 拉 docs/process/templates/02_high_level_design.md 模板(段标 [必填]/[可选] 标记),引导用户写架构/数据/接口清单,跑 DoD + critic,sign-off 后调 update_state 锁 [x] Phase 2。
 ---
 
 # /phase-2-design — 概要设计
@@ -42,18 +42,19 @@ python3 .claude/scripts/update_state.py --phase 2 --status "[~]"
 
 ### 3. 拉模板 + 引导填空
 
-读 `docs/process/templates/02_high_level_design.md`,核心段:
+读 `docs/process/templates/02_high_level_design.md`,核心段(每段已标 `[必填]` / `[可选]`):
 
 | 段 | 必填项 |
 |---|---|
-| §1 设计总览 | 一段话讲清"按什么思路拆" |
-| §2 架构图 | 文字 / ASCII 图描述系统由哪些模块组成,模块间怎么连 |
-| §2.x 数据形态(高层) | 列出"实体"(不写字段),如 User / Budget / Income / Expense / Apply |
-| §2.x 接口清单(高层) | 列出"接口方向"(不写 path / method),如"用户信息 webhook(GET) / 记账 webhook(POST) / 审批 webhook(POST)" |
-| §3 部署形态 | 容器 / 网络 / 反代 / 域名(对应 tech_stack §2.4) |
-| §4 关键技术决策 | 解释"为什么选这条栈"(对应 tech_stack 偏离或锁级提升) |
-| §5 风险 / 待办 | 已知风险 + 留给 Phase 3 细化的事项 |
-| §6 决策记录 | 实现期改 Phase 1 / Phase 2 的反向回写位置 |
+| §1 架构视图 [必填] | 文字 / ASCII 图描述系统由哪些模块组成,模块间怎么连 |
+| §2 数据模型(逻辑层) [必填] | 列出"实体"(不写字段),如 User / Budget / Income / Expense / Apply |
+| §3 接口清单 [必填] | 列出"接口方向"(不写 path / method),每行必追溯 S-XX |
+| §4 非功能需求落点 [必填] | 性能 / 安全 / 可观测 / 可维护(4 项都填,无内容写"N/A") |
+| §5 反向设计 [必填] | ≥3 条,标"不引入 X(常见诱因 Y)" |
+| §6 决策记录 [必填] | ≥1 条 |
+| §7 末尾自查:孤儿检查 [必填] | 机械 grep,必跑 |
+| §8 critic + 签字 [必填] | — |
+| §9 未来扩展 [可选] | 留 thought experiment;**两种合法状态**:整段不写 / 写了填内容。**挂标题空内容 = `ERR_OPTIONAL_SECTION_FILLED_BUT_BLANK`** |
 
 **关键提示**:
 - §2 接口清单列"接口方向",**不写 path / method** — 那是 Phase 3b 的事
@@ -107,6 +108,8 @@ python3 .claude/scripts/update_state.py \
 
 | 错误 | 行为 |
 |---|---|
+| `ERR_PHASE_1_INCOMPLETE` | phase 1 挖掘证据不全(改动 5 硬 grep),**回 phase 1 unlock 补** |
+| `ERR_OPTIONAL_SECTION_FILLED_BUT_BLANK` | §9 未来扩展挂了标题但内容是占位符,提示"删标题 / 写内容"二选一 |
 | Phase 1 未锁 | 报 `ERR_PHASE_LOCKED_BY_UPSTREAM` |
 | Phase 2 是 `[x]` | 报"已锁,需先 unlock" |
 | 实体漏覆盖 Phase 1 故事 | critic CRITICAL,提示"§2 数据形态缺 <实体> 用于 <故事>" |
@@ -115,6 +118,7 @@ python3 .claude/scripts/update_state.py \
 
 ## 不要做的
 
+- **不绕过 §9 [可选] 的二选一** —— 挂标题空内容 = ERR_OPTIONAL_SECTION_FILLED_BUT_BLANK
 - 不写 path / method(那是 3b)
 - 不写字段(那是 3c)
 - 不在 Phase 2 加 tech_stack 偏离项(必须先回 Phase 0)

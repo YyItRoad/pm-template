@@ -354,7 +354,7 @@ pm-template/                           ← 现有结构不变
         └── dod-check.md
 ```
 
-**pm-template 仓库增 12 文件** = 9 skill + 1 skill README + 1 spec + 1 plan + 2 scripts。
+**pm-template 仓库增 14 文件** = 10 (9 skill + 1 skill README) + 1 spec + 1 plan + 2 scripts。
 
 ---
 

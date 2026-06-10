@@ -262,6 +262,33 @@ def update_state(phase: int, new_status: str, **kwargs):
 | dod-check | ✗ | ✗ | — |
 | unlock | ✓(查状态 + cascade 展示) | ✓(解锁时) | ✓ |
 
+### 4.4 五类门(phase 转移的检查体系)
+
+每个 phase 锁前要过 5 类门,缺一不可。设计目的:**把 LLM 主观打分(critic)和机器机械检查(grep)分开**,失败行为不同,用户能区分"我没勾"vs"前 phase 没挖够"vs"状态不对"。
+
+| 门 | 谁判 | 判什么 | 飘忽度 | 错误码 | 失败行为 |
+|---|---|---|---|---|---|
+| **1 状态机门** | `update_state.py` | 转移是否合法(如 `[ ]→[x]` 必过 `[~]`) | 0(代码) | `ERR_INVALID_TRANSITION` | 抛异常,不动 STATE.md |
+| **2 签字门** | 用户 | "我是否认可这份产物" | 0(用户 y/n) | `ERR_USER_DECLINED` | 用户说 n,exit |
+| **3 DoD 门** | LLM + 模板 | "清单上每项是否都做了" | 中(LLM 勾) | `ERR_DOD_INCOMPLETE` | 报告未勾项,可补 |
+| **4 Critic 门** | LLM + critic 模板 | "有没有 C/H 级问题" | 高(LLM 主观) | `ERR_CRITIC_HAS_BLOCKING` | C/H 报告路径,必修 |
+| **5 硬 grep/anchor 门** | 脚本(grep) | "前 phase 产物是否含必含 anchor" | 0(机器) | `ERR_UPSTREAM_INCOMPLETE` / `ERR_PHASE_1_INCOMPLETE` | **强制回上游 phase unlock** |
+
+**第 5 类门(硬 grep 门)的关键特性**:
+- 失败 = 强制回上游 phase unlock(改动 5 落地)
+- 不是 phase 内部"修一下",是返工
+- 用 anchor 注释(`<!-- ANCHOR: xxx -->`)替代中文字段 grep,防误伤
+- 配合第 3 类门(DoD 必填段)使用:DoD 必填段在 critic 跑时再查 grep,启动时再查 grep,**双保险**
+
+**为什么 5 类分开报错误码**(不分"phase X 未通过"):
+
+用户看到错误时,需要区分三种情况:
+- "我 DoD 没勾完" → 第 3 类,补
+- "我前 phase 没挖够" → 第 5 类,回 phase 1 unlock 重挖
+- "我状态机不对" → 第 1 类,技术 bug
+
+混在"phase X 未通过"里,用户不知道该 unlock 1 还是 unlock 2。
+
 ---
 
 ## 五、资产映射
@@ -396,16 +423,22 @@ pm-template/                           ← 现有结构不变
 
 ## 十一、错误码目录
 
-| 错误码 | 触发条件 | 行为 |
-|---|---|---|
-| `ERR_INVALID_TRANSITION` | 状态机非法转移(如 [x] → [~]) | 报错 + 提示合法路径 |
-| `ERR_STATE_FILE_CORRUPT` | STATE.md parse 失败 | 备份原文件 + 拉空模板 + 提示用户手动迁移 |
-| `ERR_MISSING_REQUIRED_FIELD` | kwargs 缺必填字段 | 提示补什么字段 |
-| `ERR_CONCURRENT_WRITE` | 文件锁失败(fcntl) | 重试 3 次,失败报错 |
-| `ERR_MISSING_TEMPLATE` | 项目本地 + GitHub 都没模板 | 提示手动 `git submodule add` 补齐 |
-| `ERR_VERSION_MISMATCH` | STATE 记录的 template_sha ≠ pm-template 当前 SHA | 提示用户解锁重跑 |
-| `ERR_PHASE_LOCKED_BY_UPSTREAM` | 想改已锁 phase,但上游 [UNLOCKED] | 提示先处理上游 |
-| `ERR_CRITIC_HAS_BLOCKING` | critic 报告含 CRITICAL/HIGH,skill 试图锁 | 拒绝锁,显示报告 |
+| 错误码 | 触发条件 | 行为 | 5 类门归属 |
+|---|---|---|---|
+| `ERR_INVALID_TRANSITION` | 状态机非法转移(如 [x] → [~]) | 报错 + 提示合法路径 | 1 状态机门 |
+| `ERR_STATE_FILE_CORRUPT` | STATE.md parse 失败 | 备份原文件 + 拉空模板 + 提示用户手动迁移 | 1 状态机门 |
+| `ERR_MISSING_REQUIRED_FIELD` | kwargs 缺必填字段 | 提示补什么字段 | 1 状态机门 |
+| `ERR_CONCURRENT_WRITE` | 文件锁失败(fcntl) | 重试 3 次,失败报错 | 1 状态机门 |
+| `ERR_MISSING_TEMPLATE` | 项目本地 + GitHub 都没模板 | 提示手动 `git submodule add` 补齐 | (基础设施) |
+| `ERR_VERSION_MISMATCH` | STATE 记录的 template_sha ≠ pm-template 当前 SHA | 提示用户解锁重跑 | (基础设施) |
+| `ERR_PHASE_LOCKED_BY_UPSTREAM` | 想改已锁 phase,但上游 [UNLOCKED] | 提示先处理上游 | 1 状态机门 |
+| `ERR_CRITIC_HAS_BLOCKING` | critic 报告含 CRITICAL/HIGH,skill 试图锁 | 拒绝锁,显示报告 | 4 Critic 门 |
+| `ERR_USER_DECLINED` | 用户在 sign-off 说 n | 不锁,回 phase 末尾问"改什么" | 2 签字门 |
+| `ERR_DOD_INCOMPLETE` | DoD 模板里有未勾项 | 列出未勾项,可补 | 3 DoD 门 |
+| `ERR_INSUFFICIENT_EXPLORATION` | phase 0/1 挖掘回合 anchor 缺 / 行数不够 | 拒绝进 §4,**回 §3 重挖** | 3 DoD 门(本地) |
+| `ERR_OPTIONAL_SECTION_FILLED_BUT_BLANK` | 模板里 [可选] 段挂了标题但内容是占位符 | 提示"删标题 / 写内容"二选一 | 3 DoD 门(本地) |
+| `ERR_PHASE_1_INCOMPLETE` | phase 2/3/4 启动时 grep 01 缺 4 anchor | 提示 `/unlock 1` 回去补挖掘证据 | **5 硬 grep 门** |
+| `ERR_UPSTREAM_INCOMPLETE` | phase 3/4 启动时 grep 上游缺关键段 | 提示 `/unlock` 对应 phase 补 | **5 硬 grep 门** |
 
 **统一处理**: helper 抛异常时,skill 立即退出 + 展示 traceback 关键 3 行 + 错误码,便于用户排查。
 

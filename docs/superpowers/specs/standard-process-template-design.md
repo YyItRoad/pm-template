@@ -130,9 +130,9 @@ docs/
 │       ├── 03c_data_schema_<YYYY-MM-DD>.md
 │       └── 04_implementation_<YYYY-MM-DD>.md
 │
-├── 00_charter.md                     ← Phase 0 artifact 实例(从 现有 项目章程.md 迁移)
+├── 00_charter.md                     ← Phase 0 artifact 实例
 ├── 01_requirements.md                 ← Phase 1 artifact 实例(★ 待创建)
-├── 02_high_level_design.md            ← Phase 2 artifact 实例(从 现有 概要设计文档.md 迁移)
+├── 02_high_level_design.md            ← Phase 2 artifact 实例
 ├── 03a_business_process.md           ← Phase 3a artifact 实例
 ├── 03b_api_design.md                 ← Phase 3b artifact 实例
 ├── 03c_data_schema.md                ← Phase 3c artifact 实例

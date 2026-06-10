@@ -4,6 +4,7 @@
 > **目的**: 把 pm-template 的 5-phase 流程 + tech_stack 资产做成 Claude Code skill,从"死的文档"升级为"活的流程引擎"
 > **范围**: 9 skill(1 入口 + 5 phase + 3 辅助)+ 1 共享状态 helper + 跨项目版本管理
 > **关联 spec**: [standard-process-template-design.md](standard-process-template-design.md) · [standard-tech-stack-design.md](standard-tech-stack-design.md)
+> **版本**: 与 pm-template git tag 绑定(v1.0 = 本 spec 初版)
 
 ---
 
@@ -101,7 +102,7 @@ Claude Code 会话
    ├─ 不存在 → 拉空 STATE 模板 → 写到 <cwd>/docs/process/STATE.md
    └─ 存在   → 解析每个 phase 状态
 2. 找第一个非 [x] 的 phase,从那里开始(支持中途加入)
-3. 展示 tech_stack.md §1 锁层级,确认 L1 锁
+3. 展示 tech_stack.md §1 锁层级,让用户确认 L1 锁(逐条展示 L1 项,用户输入 y 接受 → 写入 `docs/00_charter.md` §2.5)
 4. 串行执行:
    for phase in [0, 1, 2, 3, 4]:
      if STATE[phase] == [x] : 跳过(已锁)
@@ -138,48 +139,111 @@ Claude Code 会话
 | 用户中途 `Ctrl+C` | STATE.md 留 [~],下次 `/new-project` 续 |
 | Phase N 已锁,Phase N-1 改了 | 走 unlock:提示重跑 Phase N-1 critic + N 签字 |
 
+### 3.4 Unlock 详细流程(依赖 phase 联动)
+
+当 `update_state(phase, '[UNLOCKED]', reason=...)` 被调用时:
+
+```
+1. update_state 内部:
+   - 写 phase 为 [UNLOCKED],记 unlock_reason + unlocked_at
+   - 找到所有 phase > unlock_phase,自动标 [UNLOCKED] + reason="upstream re-opened"
+   (即解锁 Phase 2 会连锁 unlock Phase 3/4)
+2. 下次 /state 或 /new-project 启动时:
+   - 提示"Phase 2/3/4 已 cascade unlock,需逐 phase 重跑 critic + 签字"
+3. 用户可手动选 phase 重跑,或 /new-project 顺序跑
+```
+
+**例**:Phase 2 改了接口清单 → Phase 2 [UNLOCKED] → Phase 3 [UNLOCKED](cascade) → Phase 4 [UNLOCKED](cascade)。下次跑从 Phase 2 开始,3 和 4 也会被 critic 抓出"上游接口变了"。
+
+### 3.5 L1 锁确认细节
+
+`/new-project` 第 3 步的具体交互:
+
+```
+> 读 tech_stack.md §1 锁层级(38 条 L1 锁)
+> 展示给你确认:
+>   🔒 L1-001: Python 3.12+
+>   🔒 L1-002: FastAPI 0.115+
+>   ...(共 38 条)
+>
+> 全部接受?(输入 y/n)
+>   [y] 接受全部 L1 锁,写 docs/00_charter.md §2.5
+>   [n] 中断,需手动改 tech_stack.md(重量级偏航,需写偏离项)
+```
+
 ---
 
 ## 四、状态读写协议(强约束)
 
-### 4.1 唯一写 STATE.md 的 helper
+### 4.1 状态机(单一真源)
+
+```
+[ ] ──→ [~] ──→ [x] ⇄ [UNLOCKED] ──→ [x]   (正常流程 + unlock)
+                                          
+另外两个终态:
+[SKIP]                                       (主动跳过,写理由)
+[x] LEGACY                                   (历史包袱,试点项目用)
+```
+
+**所有合法转移**:
+- `[ ] → [~]`:开始干活
+- `[~] → [x]`:完成 + 签字
+- `[x] → [UNLOCKED]`:发现错了,解锁重做
+- `[UNLOCKED] → [~]`:开始重做
+- `[UNLOCKED] → [x]`:重做完成,重新锁
+- `[ ] → [SKIP]`:判定本 phase 不需要(必须写 `skip_reason`)
+
+**禁止转移**(报 `ERR_INVALID_TRANSITION`):
+- `[x] → [~]`(锁了不能直接回退,必须先 [UNLOCKED])
+- `[ ] → [x]`(必须经过 [~])
+- `[SKIP] → [x]`(需先 [UNLOCKED])
+- `[x] LEGACY → 任何`(历史包袱不可改)
+- `[UNLOCKED] → [ ]`(避免状态机回退到起点)
+- 任何"跳级"如 `[ ] → [UNLOCKED]`
+
+**特殊状态**:
+- `[x] LEGACY`:试点项目专用(如 KidBudget 的历史 phase),**只能由 migration 脚本**(在 pm-template 仓库内提供)写入。skill 9 个均无权限设 LEGACY。这是"只读历史包袱"。
+
+### 4.2 唯一写 STATE.md 的 helper
 
 ```python
+# 位置: pm-template/scripts/update_state.py
+# 9 skill 通过 `from update_state import update_state` 引用
+# 路径相对 <pm-template root>,子项目通过 `git submodule` 或 pip 路径解析
+
 def update_state(phase: int, new_status: str, **kwargs):
     """唯一写 STATE.md 的 helper,9 skill 共享。
     
     Args:
         phase: 0|1|2|3|4
-        new_status: [ ]| [~] | [x] | [SKIP] | [UNLOCKED] | [x] LEGACY
-        **kwargs: signed_by, signed_at, critic_report_path, 
-                 dod_count, lock_reason, template_sha
+        new_status: 6 个合法状态之一
+        **kwargs:
+            signed_by: str                 # 签字人
+            signed_at: str                 # YYYY-MM-DD
+            critic_report_path: str        # 相对 <project root>
+            dod_count: str                 # "12/12" 格式
+            lock_reason: str               # UNLOCKED 时必填
+            skip_reason: str               # [SKIP] 时必填
+            template_sha: str              # git SHA,锁时记录(版本对齐)
+    
+    Returns:
+        写成功的 STATE.md diff 字符串
+    
+    Raises:
+        ERR_INVALID_TRANSITION: 状态机非法
+        ERR_STATE_FILE_CORRUPT: STATE.md 解析失败
+        ERR_MISSING_REQUIRED_FIELD: kwargs 缺必填
+        ERR_CONCURRENT_WRITE: 文件锁失败
     """
-    # 1. 读 <cwd>/docs/process/STATE.md
-    # 2. 找到 "## Phase {phase}" 段,parse 当前 bullets
-    # 3. 校验状态机:
-    #    [x] → [UNLOCKED] 允许
-    #    [ ] → [~] → [x] 允许
-    #    [SKIP] / [x] LEGACY → [x] 需走 unlock
-    #    其他报 ERR_INVALID_TRANSITION
-    # 4. 合并 kwargs 到 bullets
-    # 5. 原子写(先 .tmp 再 rename)
-    # 6. 打印 diff 给用户确认
+    # 1. 校验 new_status ∈ 6 个合法值
+    # 2. 校验 kwargs 必填字段(按 new_status 类型)
+    # 3. 读 <cwd>/docs/process/STATE.md + 解析
+    # 4. 找 "## Phase {phase}" 段,parse 当前 status
+    # 5. 状态机转移校验(对照 §4.1 合法表)
+    # 6. 合并 kwargs 到 bullets
+    # 7. 原子写(先 .tmp 再 rename + 文件锁 fcntl)
+    # 8. 打印 diff 给用户
 ```
-
-### 4.2 状态机
-
-```
-[ ] ──→ [~] ──→ [x]    (正常流程)
-                      ↓
-                  [UNLOCKED] ──→ [x]  (unlock 后重锁)
-                  [SKIP]      (跳过,需写理由)
-                  [x] LEGACY  (试点历史包袱)
-```
-
-**禁止转移**:
-- `[x] → [~]`(锁了不能回退到进行中,必须先 UNLOCK)
-- `[ ] → [x]`(必须经过 [~])
-- `[SKIP] → [x]`(需先 [UNLOCKED])
 
 ### 4.3 9 skill 与 STATE.md 的关系
 
@@ -209,7 +273,11 @@ def update_state(phase: int, new_status: str, **kwargs):
 
 **模板内容怎么拉**:
 - 优先读项目本地 `docs/process/templates/0X_*.md`(已用 Use this template 复制过来)
-- 若缺失 → 报 ERR_MISSING_TEMPLATE,提示从 pm-template GitHub raw 拉
+- 若缺失 → 报 `ERR_MISSING_TEMPLATE`,提示从 pm-template GitHub raw 拉:
+  - URL pattern: `https://raw.githubusercontent.com/YyItRoad/pm-template/<SHA>/docs/process/templates/0X_*.md`
+  - `<SHA>` 默认用项目 `STATE.md` 记录的 `template_sha`(避免拉错版本)
+  - 离线(无网络)→ 提示"无法拉,需手动 git submodule add pm-template 补齐"
+- 子项目也可以用 `git submodule add YyItRoad/pm-template vendor/pm-template` 把模板资产 pin 在 vendor/
 
 ---
 
@@ -217,11 +285,11 @@ def update_state(phase: int, new_status: str, **kwargs):
 
 ### 6.1 单一真源:pm-template git tag = skill 版本
 
-| pm-template tag | skill 版本 | docs/process/ | .claude/skills/ |
-|---|---|---|---|
-| (无 tag, main) | rolling | latest | latest |
-| `v1.0` | v1.0 | v1.0 冻结 | v1.0 冻结 |
-| `v1.1` | v1.1 | v1.0 + 增量 | v1.0 + 增量 |
+| pm-template tag | docs/process/ | .claude/skills/ |
+|---|---|---|
+| (无 tag, main) | latest | latest |
+| `v1.0` | v1.0 冻结 | v1.0 冻结 |
+| `v1.1` | v1.0 + 增量 | v1.0 + 增量 |
 
 ### 6.2 子项目版本策略
 
@@ -231,7 +299,7 @@ def update_state(phase: int, new_status: str, **kwargs):
 
 ### 6.3 版本对齐 warn
 
-每个 phase skill 启动时:
+**`/state` 启动时** + **每个 phase skill 启动时** 都做版本对齐检查(不只 phase skill 启动时):
 
 ```
 if <pm-template git SHA> != <STATE.md 记录的 template_sha>:
@@ -240,6 +308,8 @@ if <pm-template git SHA> != <STATE.md 记录的 template_sha>:
 ```
 
 **记录位置**: `STATE.md` 每个 phase bullets 末尾加 `template_sha: <SHA>` 一行,首次锁时写入。
+
+**`/state` 的 version 模式**:`/state --audit` 命令扫描所有 phase 的 template_sha,列出过期 phase 清单(给用户决定是否批量 unlock)。
 
 ### 6.4 禁止
 
@@ -257,12 +327,22 @@ pm-template/                           ← 现有结构不变
 ├── README.md
 ├── .gitignore
 ├── docs/                              ← 现有
-│   ├── process/                       ← 现有
+│   ├── process/                       ← 现有(20 文件)
+│   │   ├── tech_stack.md
+│   │   ├── templates/{00-03}_*.md     ← 4 文件
+│   │   ├── dod/{00-04}_*.md           ← 5 文件
+│   │   ├── critics/{00,01,02,03a,03b,03c,04}_*.md  ← 7 文件
+│   │   ├── critics/reports/.gitkeep
+│   │   ├── README.md / STATE.md / CHANGELOG.md
 │   └── superpowers/                   ← 现有
 │       ├── specs/                     ← 加:本 spec
 │       └── plans/                     ← 加:skill 实施 plan
+├── scripts/                           ← 新增
+│   ├── update_state.py                ← 共享 helper(§4.2)
+│   └── migrate_legacy_state.py        ← 写 [x] LEGACY 专用
 └── .claude/                           ← 新增
-    └── skills/                        ← 新增
+    └── skills/                        ← 新增(9 skill + 1 readme)
+        ├── README.md
         ├── new-project.md
         ├── phase-0-charter.md
         ├── phase-1-requirements.md
@@ -274,7 +354,7 @@ pm-template/                           ← 现有结构不变
         └── dod-check.md
 ```
 
-**pm-template 仓库增 11 文件** = 9 skill + 1 spec + 1 plan。
+**pm-template 仓库增 12 文件** = 9 skill + 1 skill README + 1 spec + 1 plan + 2 scripts。
 
 ---
 
@@ -307,3 +387,62 @@ pm-template/                           ← 现有结构不变
 - 实施时调用 `writing-plans` skill 出 per-task plan
 - Phase 4 skill 涉及实际编码,与 superpowers:subagent-driven-development / tdd-guide 集成(可选,后续细化)
 - 未来 skill 数量 > 20 时,考虑拆 plugin marketplace(本期不做)
+
+---
+
+## 十一、错误码目录
+
+| 错误码 | 触发条件 | 行为 |
+|---|---|---|
+| `ERR_INVALID_TRANSITION` | 状态机非法转移(如 [x] → [~]) | 报错 + 提示合法路径 |
+| `ERR_STATE_FILE_CORRUPT` | STATE.md parse 失败 | 备份原文件 + 拉空模板 + 提示用户手动迁移 |
+| `ERR_MISSING_REQUIRED_FIELD` | kwargs 缺必填字段 | 提示补什么字段 |
+| `ERR_CONCURRENT_WRITE` | 文件锁失败(fcntl) | 重试 3 次,失败报错 |
+| `ERR_MISSING_TEMPLATE` | 项目本地 + GitHub 都没模板 | 提示手动 `git submodule add` 补齐 |
+| `ERR_VERSION_MISMATCH` | STATE 记录的 template_sha ≠ pm-template 当前 SHA | 提示用户解锁重跑 |
+| `ERR_PHASE_LOCKED_BY_UPSTREAM` | 想改已锁 phase,但上游 [UNLOCKED] | 提示先处理上游 |
+| `ERR_CRITIC_HAS_BLOCKING` | critic 报告含 CRITICAL/HIGH,skill 试图锁 | 拒绝锁,显示报告 |
+
+**统一处理**: helper 抛异常时,skill 立即退出 + 展示 traceback 关键 3 行 + 错误码,便于用户排查。
+
+---
+
+## 十二、Sign-off 输入解析
+
+§3.2 sign-off 提示用户输入 `y/n/c`:
+- `y` → 解析为 lock,进入 sign 提示:`name?` + `date?(回车默认今天)` → 调 `update_state`
+- `n` → 解析为不锁,return 当前 phase 末尾提示"需修改什么?"
+- `c` → 解析为展示完整 critic 报告
+
+**name 验证**: 非空,长度 ≤ 50 字符。无格式校验(中文 / 英文 / 数字都可)。
+**date 验证**: 必须是 `YYYY-MM-DD` 格式,默认今天(`datetime.date.today().isoformat()`)。
+
+**例**:
+```
+> [y] 锁
+> 请输入签字人姓名: Alice
+> 请输入签字日期(YYYY-MM-DD,回车默认今天): [回车]
+> 签字: Alice 2026-06-10
+> update_state(0, '[x]', signed_by='Alice', signed_at='2026-06-10', ...) ✓
+```
+
+---
+
+## 十三、Phase 4 skill 提示词骨架
+
+`/phase-4-implement` 与其他 phase 不同:写业务代码,不是文档。骨架:
+
+```
+1. 读 <cwd>/docs/03b_api_design.md §B 接口清单
+2. 读 <cwd>/docs/01_requirements.md §2 故事 + AC
+3. 调 TDD 循环:对每接口 写测试 → 实现 → 跑 e2e
+4. 跑 dod/04_implementation.md 自检:
+   - AC 覆盖率 = e2e 命中 AC 数 / Phase 1 AC 总数
+   - 范围蔓延(代码层 grep)
+   - 接口一致性(diff @router 装饰器 vs 03b path/method)
+   - 反向需求真没做(grep Phase 1 §5)
+5. update_state(4, '[x]', ...)
+6. 提示"5 phase 全锁,进入维护模式"
+```
+
+**与 superpowers 集成**(可选): Phase 4 skill 可调用 subagent-driven-development 派发 TDD 实现子任务,但本期不强制。

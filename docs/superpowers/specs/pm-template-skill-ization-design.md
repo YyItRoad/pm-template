@@ -1,8 +1,8 @@
 # pm-template Skill 化 — 设计 spec
 
-> **状态**: ✅ 设计已批准,待实施
+> **状态**: ✅ 设计已批准,实施中
 > **目的**: 把 pm-template 的 5-phase 流程 + tech_stack 资产做成 Claude Code skill,从"死的文档"升级为"活的流程引擎"
-> **范围**: 9 skill(1 入口 + 5 phase + 3 辅助)+ 1 共享状态 helper + 跨项目版本管理
+> **范围**: 10 skill(1 入口 + 5 phase + 4 辅助)+ 1 共享状态 helper + 跨项目版本管理
 > **关联 spec**: [standard-process-template-design.md](standard-process-template-design.md) · [standard-tech-stack-design.md](standard-tech-stack-design.md)
 > **版本**: 与 pm-template git tag 绑定(v1.0 = 本 spec 初版)
 
@@ -49,7 +49,7 @@ pm-template 仓库已落地:`docs/process/{templates,dod,critics,tech_stack.md}`
 
 ## 二、架构总览
 
-### 2.1 9 Skill 总览
+### 2.1 10 Skill 总览
 
 ```
 Claude Code 会话
@@ -68,9 +68,10 @@ Claude Code 会话
 辅助 skill(独立可用):
   /critic <phase>       ← 单跑 critic 模板
   /dod-check <phase>    ← 单跑 DoD 勾选
+  /unlock <phase>       ← 解锁 [x] phase + cascade 下游(spec §3.4)
 ```
 
-### 2.2 9 Skill 职责矩阵
+### 2.2 10 Skill 职责矩阵
 
 | # | Skill 文件 | 触发命令 | 职责 | 写 STATE.md |
 |---|---|---|---|---|
@@ -83,11 +84,12 @@ Claude Code 会话
 | 7 | `state.md` | `/state` | 读 STATE.md,渲染当前 phase + 建议下一步 | 只读 |
 | 8 | `critic.md` | `/critic <phase>` | 单跑 critic 模板,产报告存档 | 不写 |
 | 9 | `dod-check.md` | `/dod-check <phase>` | 单跑 DoD 勾选,缺啥报啥 | 不写 |
+| 10 | `unlock.md` | `/unlock <phase>` | 解锁 [x] phase + cascade 下游(改产物的入口) | 写 [UNLOCKED] |
 
 ### 2.3 关键约束
 
 - skill 写 STATE.md **必须**走唯一 helper `update_state()`(避免格式漂移 + 并发覆盖)
-- 9 skill **只读** `docs/process/templates/` `dod/` `critics/` `tech_stack.md`(不修改模板)
+- 10 skill **只读** `docs/process/templates/` `dod/` `critics/` `tech_stack.md`(不修改模板)
 - Phase 4 特殊:写业务代码,不是文档
 - 所有 skill 启动时**先检查 pm-template git SHA 是否变更**(版本对齐 warn)
 
@@ -202,17 +204,17 @@ Claude Code 会话
 - 任何"跳级"如 `[ ] → [UNLOCKED]`
 
 **特殊状态**:
-- `[x] LEGACY`:试点项目专用(如旧项目的历史 phase),**只能由 migration 脚本**(在 pm-template 仓库内提供)写入。skill 9 个均无权限设 LEGACY。这是"只读历史包袱"。
+- `[x] LEGACY`:试点项目专用(如旧项目的历史 phase),**只能由 migration 脚本**(在 pm-template 仓库内提供)写入。skill 10 个均无权限设 LEGACY。这是"只读历史包袱"。
 
 ### 4.2 唯一写 STATE.md 的 helper
 
 ```python
 # 位置: pm-template/.claude/scripts/update_state.py
-# 9 skill 通过 `from update_state import update_state` 引用
+# 10 skill 通过 `from update_state import update_state` 引用
 # 路径相对 <pm-template root>,子项目通过 `git submodule` 或 pip 路径解析
 
 def update_state(phase: int, new_status: str, **kwargs):
-    """唯一写 STATE.md 的 helper,9 skill 共享。
+    """唯一写 STATE.md 的 helper,10 skill 共享。
     
     Args:
         phase: 0|1|2|3|4
@@ -245,7 +247,7 @@ def update_state(phase: int, new_status: str, **kwargs):
     # 8. 打印 diff 给用户
 ```
 
-### 4.3 9 skill 与 STATE.md 的关系
+### 4.3 10 skill 与 STATE.md 的关系
 
 | Skill | 读 STATE.md | 写 STATE.md | 走 update_state |
 |---|---|---|---|
@@ -258,6 +260,7 @@ def update_state(phase: int, new_status: str, **kwargs):
 | state | ✓ | ✗ | — |
 | critic | ✗ | ✗ | — |
 | dod-check | ✗ | ✗ | — |
+| unlock | ✓(查状态 + cascade 展示) | ✓(解锁时) | ✓ |
 
 ---
 
@@ -338,7 +341,7 @@ pm-template/                           ← 现有结构不变
 │       ├── specs/                     ← 加:本 spec
 │       └── plans/                     ← 加:skill 实施 plan
 ├── .claude/                           ← 新增
-    ├── skills/                        ← 新增(9 skill + 1 readme)
+    ├── skills/                        ← 新增(10 skill + 1 readme)
     │   ├── README.md
     │   ├── new-project.md
     │   ├── phase-0-charter.md
@@ -348,13 +351,14 @@ pm-template/                           ← 现有结构不变
     │   ├── phase-4-implement.md
     │   ├── state.md
     │   ├── critic.md
-    │   └── dod-check.md
+    │   ├── dod-check.md
+    │   └── unlock.md
     └── scripts/                       ← 新增
         ├── update_state.py            ← 共享 helper(§4.2)
         └── migrate_legacy_state.py    ← 写 [x] LEGACY 专用
 ```
 
-**pm-template 仓库增 14 文件** = 10 (9 skill + 1 skill README) + 1 spec + 1 plan + 2 scripts。
+**pm-template 仓库增 15 文件** = 11 (10 skill + 1 skill README) + 1 spec + 1 plan + 2 scripts。
 
 ---
 
@@ -362,7 +366,7 @@ pm-template/                           ← 现有结构不变
 
 | 维度 | 验证方式 | 通过条件 |
 |---|---|---|
-| **Skill 加载** | 9 个 skill 文件 frontmatter 合规,能被 Claude Code 识别 | `claude` 启动后 `/` 面板列出 9 条 |
+| **Skill 加载** | 10 个 skill 文件 frontmatter 合规,能被 Claude Code 识别 | `claude` 启动后 `/` 面板列出 10 条 |
 | **State helper 单测** | `update_state` 函数 pytest,5 种合法转移 + 3 种非法转移 | 8/8 通过 |
 | **happy path 跑通** | 真开 toy 项目,`/new-project` 跑完 5 phase 锁 | 中途无需手工改 STATE.md |
 | **failure 跑通** | 故意给 critic 制造 CRITICAL,看是否正确阻塞 | Phase 不锁,STATE.md 不动 |
@@ -372,7 +376,7 @@ pm-template/                           ← 现有结构不变
 
 ## 九、Verification Checklist(实施后签收)
 
-- [ ] 9 skill 文件 frontmatter 合规,被 Claude Code 识别
+- [ ] 10 skill 文件 frontmatter 合规,被 Claude Code 识别
 - [ ] `update_state` helper 8 个 pytest 全过
 - [ ] toy 项目 `/new-project` 跑通 Phase 0→4 全部锁
 - [ ] critic CRITICAL 时正确阻塞,不锁

@@ -1,11 +1,11 @@
 # pm-template Skills
 
-> 9 个 Claude Code skill,把 pm-template 的 5-phase 流程 + tech_stack 资产从"死的文档"升级为"活的流程引擎"。
+> 10 个 Claude Code skill,把 pm-template 的 5-phase 流程 + tech_stack 资产从"死的文档"升级为"活的流程引擎"。
 > 设计 spec: [`docs/superpowers/specs/pm-template-skill-ization-design.md`](../../docs/superpowers/specs/pm-template-skill-ization-design.md)
 
 ---
 
-## 9 Skill 一览
+## 10 Skill 一览
 
 | # | Skill | 触发命令 | 职责 | 写 STATE.md |
 |---|---|---|---|---|
@@ -18,6 +18,7 @@
 | 7 | `state.md` | `/state` | 读 STATE.md,渲染当前 phase + 建议下一步 | 只读 |
 | 8 | `critic.md` | `/critic <phase>` | 单跑 critic 模板,产报告存档 | 不写 |
 | 9 | `dod-check.md` | `/dod-check <phase>` | 单跑 DoD 勾选,缺啥报啥 | 不写 |
+| 10 | `unlock.md` | `/unlock <phase>` | 解锁 [x] phase + cascade 下游 | 写 [UNLOCKED] |
 
 ## 推荐工作流
 
@@ -38,6 +39,7 @@
 辅助(任何时机单跑):
 /critic <phase>                ← 单跑 critic 模板
 /dod-check <phase>             ← 单跑 DoD 勾选
+/unlock <phase>                ← 解锁 [x] phase + cascade 下游
 ```
 
 ## 关键约束(所有 skill 遵守)

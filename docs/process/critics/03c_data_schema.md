@@ -36,6 +36,11 @@
    - 主键用 INT AUTO_INCREMENT 或 BIGINT,不是 UUID(除非特别需要)?
    - 错 = HIGH
 
+8. **数据层规范对齐**
+   - 表命名 / 字段类型 / 字符集 / 索引命名是否对齐 `docs/process/tech_stack.md` §2.3 数据层规范
+   - utf8mb4 + InnoDB + snake_case + DECIMAL(10,2) 全部满足?
+   - 任一不满足 = HIGH
+
 ## 输出格式
 
 - markdown 报告

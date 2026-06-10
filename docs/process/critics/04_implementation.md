@@ -36,6 +36,11 @@
    - `docker compose up` 起得来?
    - 失败 = CRITICAL
 
+8. **技术栈一致性**
+   - 实际代码使用的库 / 工具与 Phase 0 §2.5 选型一致
+   - 无未在 Phase 0 / Phase 2 锁过的新依赖
+   - 实际引入但未在 Phase 0 §2.5 / Phase 2 记录的库 = HIGH(擅自加依赖)
+
 ## 输出格式
 
 - markdown 报告

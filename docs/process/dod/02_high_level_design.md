@@ -14,3 +14,4 @@
 - [ ] 7.2 **没有出现 charter §4 禁忌的设计**(grep 禁词清单)
 - [ ] 8.1 **critic 自审报告无 CRITICAL/HIGH**
 - [ ] 8.2 **你本人 review 过,在 §8 末尾签字**
+- [ ] 技术选型未引入 `docs/process/tech_stack.md` §2-§6 L1 锁层之外的栈(若有偏离,Phase 0 §2.5 已签字)

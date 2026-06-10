@@ -26,3 +26,4 @@
 
 - [ ] critic 报告(03a/03b/03c 三份)均无 CRITICAL/HIGH
 - [ ] 你本人 review + 签字
+- [ ] §A 流程 / §B 接口 / §C DDL 命名、字段类型、接口风格与 `docs/process/tech_stack.md` §3 §4 对齐

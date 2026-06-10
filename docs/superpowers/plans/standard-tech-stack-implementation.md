@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 把 KidBudget 的 5-phase 流程模板资产(20 文件)+ 设计 spec 完整迁移到 pm-template 仓库,加 `tech_stack.md` 与 9 处模板/DoD/critic 改动,pm-template 仓库**零** KidBudget 残留,GitHub "Use this template" 可用。
+**Goal:** 把 <源项目> 的 5-phase 流程模板资产(20 文件)+ 设计 spec 完整迁移到 pm-template 仓库,加 `tech_stack.md` 与 9 处模板/DoD/critic 改动,pm-template 仓库**零** <源项目> 残留,GitHub "Use this template" 可用。
 
-**Architecture:** **MOVE 而非 COPY** — 用 `cp` + 双仓库 `git rm`/`git add` 模式实现跨仓库"移动"。KidBudget 仓库最终**无** `docs/process/` 目录;pm-template 仓库**无** KidBudget 任何内容。KidBudget 阶段文档中残留的 `docs/process/` 引用全部改指 pm-template GitHub URL。
+**Architecture:** **MOVE 而非 COPY** — 用 `cp` + 双仓库 `git rm`/`git add` 模式实现跨仓库"移动"。<源项目> 仓库最终**无** `docs/process/` 目录;pm-template 仓库**无** <源项目> 任何内容。<源项目> 阶段文档中残留的 `docs/process/` 引用全部改指 pm-template GitHub URL。
 
 **Tech Stack:** Markdown(纯文档项目)、Conventional Commits、GitHub Template Repository。
 
@@ -19,7 +19,7 @@
 - 模板的 `YYYY-MM-DD` **占位符**保留(用户填写时替换)
 - Conventional Commits:`docs:` / `chore:` / `feat:`
 - 中文为主,关键术语中英对照
-- **pm-template 中任何文件零 KidBudget 内容**(项目名、commit hash、日期、具体路径都禁出现)
+- **pm-template 中任何文件零 <源项目> 内容**(项目名、commit hash、日期、具体路径都禁出现)
 
 ---
 
@@ -33,10 +33,10 @@ pm-template/
 ├── README.md                         ← 新建(描述 pm-template 自己)
 ├── .gitignore                        ← 新建(pm-template 自己需要的忽略)
 └── docs/
-    ├── process/                      ← 从 KidBudget MOVE 过来(20 文件)
-    │   ├── README.md                 ← MOVE + 完全改写(去 KidBudget 特定化)
+    ├── process/                      ← 从 <源项目> MOVE 过来(20 文件)
+    │   ├── README.md                 ← MOVE + 完全改写(去 <源项目> 特定化)
     │   ├── STATE.md                  ← MOVE + 完全改写(空模板)
-    │   ├── CHANGELOG.md              ← MOVE + 完全改写(无 KidBudget 试点引用)
+    │   ├── CHANGELOG.md              ← MOVE + 完全改写(无 <源项目> 试点引用)
     │   ├── tech_stack.md             ← 新建(标准栈规范,~400-500 行)
     │   ├── templates/                ← MOVE(5 文件,3 文件后续改)
     │   │   ├── 00_charter.md         ← 改:加 §2.5
@@ -62,19 +62,19 @@ pm-template/
     └── superpowers/
         ├── specs/
         │   ├── standard-tech-stack-design.md  ← 已有(本 plan 不动)
-        │   └── standard-process-template-design.md  ← 从 KidBudget MOVE
+        │   └── standard-process-template-design.md  ← 从 <源项目> MOVE
         └── plans/
             └── standard-tech-stack-implementation.md  ← 本文件
 ```
 
-### KidBudget 终态(MOVE 完成后)
+### <源项目> 终态(MOVE 完成后)
 
 ```
-KidBudget/
+<源项目>/
 ├── docs/
 │   ├── 00_charter.md ~ 03c_data_schema.md   ← 7 个 phase 文档,内部 docs/process/ 引用全部改 pm-template URL
 │   ├── superpowers/
-│   │   ├── specs/  ← standard-process-template-design.md 已被 move,无 KidBudget 设计 spec 残留
+│   │   ├── specs/  ← standard-process-template-design.md 已被 move,无 <源项目> 设计 spec 残留
 │   │   ├── plans/  ← (不动)
 │   │   └── ...
 │   ├── 功能说明.md  ← 内部引用检查
@@ -228,7 +228,7 @@ EOF
 cd /Users/yangyang/Desktop/Github/pm-template
 ls -la LICENSE README.md .gitignore
 git add LICENSE README.md .gitignore
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "chore: scaffold repo (LICENSE + README + .gitignore)"
 ```
 
@@ -236,15 +236,15 @@ git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
 
 ---
 
-### Task 2: MOVE 16 个模板/DoD/critic 文件(KidBudget → pm-template)
+### Task 2: MOVE 16 个模板/DoD/critic 文件(<源项目> → pm-template)
 
 **Files:**
 - Create in pm-template: `docs/process/templates/{00_charter,01_requirements,02_high_level_design,03_detailed_design}.md`(4 文件)
 - Create in pm-template: `docs/process/dod/{00_charter,01_requirements,02_high_level_design,03_detailed_design,04_implementation}.md`(5 文件)
 - Create in pm-template: `docs/process/critics/{00_charter,01_requirements,02_high_level_design,03a_business_process,03b_api_design,03c_data_schema,04_implementation}.md` + `reports/.gitkeep`(7 + 1 文件)
-- Delete in KidBudget: 整个 `docs/process/{templates,dod,critics}/` 目录(后续 Task 10 一起做)
+- Delete in <源项目>: 整个 `docs/process/{templates,dod,critics}/` 目录(后续 Task 10 一起做)
 
-- [ ] **Step 2.1: 从 KidBudget 复制 16 文件到 pm-template**
+- [ ] **Step 2.1: 从 <源项目> 复制 16 文件到 pm-template**
 
 ```bash
 cd /Users/yangyang/Desktop/Github/pm-template
@@ -252,22 +252,22 @@ mkdir -p docs/process/templates docs/process/dod docs/process/critics/reports
 
 # templates/ (4 文件,无 04)
 for f in 00_charter 01_requirements 02_high_level_design 03_detailed_design; do
-  cp /Users/yangyang/Desktop/Github/KidBudget/docs/process/templates/${f}.md \
+  cp /Users/yangyang/Desktop/Github/<源项目>/docs/process/templates/${f}.md \
      docs/process/templates/${f}.md
 done
 
 # dod/ (5 文件)
 for f in 00_charter 01_requirements 02_high_level_design 03_detailed_design 04_implementation; do
-  cp /Users/yangyang/Desktop/Github/KidBudget/docs/process/dod/${f}.md \
+  cp /Users/yangyang/Desktop/Github/<源项目>/docs/process/dod/${f}.md \
      docs/process/dod/${f}.md
 done
 
 # critics/ (7 文件 + .gitkeep)
 for f in 00_charter 01_requirements 02_high_level_design 03a_business_process 03b_api_design 03c_data_schema 04_implementation; do
-  cp /Users/yangyang/Desktop/Github/KidBudget/docs/process/critics/${f}.md \
+  cp /Users/yangyang/Desktop/Github/<源项目>/docs/process/critics/${f}.md \
      docs/process/critics/${f}.md
 done
-cp /Users/yangyang/Desktop/Github/KidBudget/docs/process/critics/reports/.gitkeep \
+cp /Users/yangyang/Desktop/Github/<源项目>/docs/process/critics/reports/.gitkeep \
    docs/process/critics/reports/.gitkeep
 ```
 
@@ -275,21 +275,21 @@ cp /Users/yangyang/Desktop/Github/KidBudget/docs/process/critics/reports/.gitkee
 
 ```bash
 cd /Users/yangyang/Desktop/Github/pm-template
-# 这些文件在 KidBudget 是纯模板,pm-template 拿过来应逐字节一致
-diff -r /Users/yangyang/Desktop/Github/KidBudget/docs/process/templates/ \
+# 这些文件在 <源项目> 是纯模板,pm-template 拿过来应逐字节一致
+diff -r /Users/yangyang/Desktop/Github/<源项目>/docs/process/templates/ \
         docs/process/templates/
-diff -r /Users/yangyang/Desktop/Github/KidBudget/docs/process/dod/ \
+diff -r /Users/yangyang/Desktop/Github/<源项目>/docs/process/dod/ \
         docs/process/dod/
-diff -r /Users/yangyang/Desktop/Github/KidBudget/docs/process/critics/ \
+diff -r /Users/yangyang/Desktop/Github/<源项目>/docs/process/critics/ \
         docs/process/critics/
 # 预期:无任何 diff 输出
 ```
 
-- [ ] **Step 2.3: 验证零 KidBudget 内容**
+- [ ] **Step 2.3: 验证零 <源项目> 内容**
 
 ```bash
 cd /Users/yangyang/Desktop/Github/pm-template
-grep -r "KidBudget" docs/process/templates/ docs/process/dod/ docs/process/critics/ 2>&1
+grep -r "<源项目>" docs/process/templates/ docs/process/dod/ docs/process/critics/ 2>&1
 # 预期:无输出
 ```
 
@@ -298,22 +298,22 @@ grep -r "KidBudget" docs/process/templates/ docs/process/dod/ docs/process/criti
 ```bash
 cd /Users/yangyang/Desktop/Github/pm-template
 git add docs/process/templates/ docs/process/dod/ docs/process/critics/
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
-    commit -m "docs(process): move 16 template/dod/critic files from KidBudget"
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
+    commit -m "docs(process): move 16 template/dod/critic files from <源项目>"
 ```
 
-**预期**: 16 文件 created,1 commit。`diff` 无输出,`grep KidBudget` 无输出。
+**预期**: 16 文件 created,1 commit。`diff` 无输出,`grep <源项目>` 无输出。
 
 ---
 
-### Task 3: 在 pm-template 新建 3 个 meta 文件(README/STATE/CHANGELOG,无 KidBudget 内容)
+### Task 3: 在 pm-template 新建 3 个 meta 文件(README/STATE/CHANGELOG,无 <源项目> 内容)
 
 **Files:**
 - Create in pm-template: `docs/process/README.md`(完全重写,描述 pm-template 自己的 docs/process/)
 - Create in pm-template: `docs/process/STATE.md`(空模板,全部 [ ])
-- Create in pm-template: `docs/process/CHANGELOG.md`(纯 v0.1.0 + v0.2.0,无 KidBudget 引用)
+- Create in pm-template: `docs/process/CHANGELOG.md`(纯 v0.1.0 + v0.2.0,无 <源项目> 引用)
 
-> **不**从 KidBudget 复制这 3 个文件,因为它们含 KidBudget 特定内容(LEGACY phase 状态 / KidBudget 试点描述)。在 pm-template 全新写。
+> **不**从 <源项目> 复制这 3 个文件,因为它们含 <源项目> 特定内容(LEGACY phase 状态 / <源项目> 试点描述)。在 pm-template 全新写。
 
 - [ ] **Step 3.1: 写 docs/process/README.md(pm-template 自己的)**
 
@@ -447,7 +447,7 @@ cat > /Users/yangyang/Desktop/Github/pm-template/docs/process/STATE.md <<'EOF'
 EOF
 ```
 
-- [ ] **Step 3.3: 写 docs/process/CHANGELOG.md(无 KidBudget 引用)**
+- [ ] **Step 3.3: 写 docs/process/CHANGELOG.md(无 <源项目> 引用)**
 
 ```markdown
 # 流程模板迭代历史
@@ -478,44 +478,44 @@ EOF
 **设计 spec**: `docs/superpowers/specs/standard-tech-stack-design.md`
 ```
 
-- [ ] **Step 3.4: 验证零 KidBudget 内容 + commit**
+- [ ] **Step 3.4: 验证零 <源项目> 内容 + commit**
 
 ```bash
 cd /Users/yangyang/Desktop/Github/pm-template
-grep -E "KidBudget|yyitroad" docs/process/README.md docs/process/STATE.md docs/process/CHANGELOG.md
+grep -E "<源项目>|<签字人>" docs/process/README.md docs/process/STATE.md docs/process/CHANGELOG.md
 # 预期:无输出
 git add docs/process/README.md docs/process/STATE.md docs/process/CHANGELOG.md
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "docs(process): add pm-template-specific README/STATE/CHANGELOG"
 ```
 
-**预期**: 3 文件 created,1 commit。`grep KidBudget/yyitroad` 无输出。
+**预期**: 3 文件 created,1 commit。`grep <源项目>/<签字人>` 无输出。
 
 ---
 
-### Task 4: MOVE 设计 spec(KidBudget → pm-template)
+### Task 4: MOVE 设计 spec(<源项目> → pm-template)
 
 **Files:**
-- Move in KidBudget: `docs/superpowers/specs/standard-process-template-design.md` → 删除
+- Move in <源项目>: `docs/superpowers/specs/standard-process-template-design.md` → 删除
 - Create in pm-template: `docs/superpowers/specs/standard-process-template-design.md`
 
 - [ ] **Step 4.1: 复制 + 验证**
 
 ```bash
-cp /Users/yangyang/Desktop/Github/KidBudget/docs/superpowers/specs/standard-process-template-design.md \
+cp /Users/yangyang/Desktop/Github/<源项目>/docs/superpowers/specs/standard-process-template-design.md \
    /Users/yangyang/Desktop/Github/pm-template/docs/superpowers/specs/standard-process-template-design.md
 
-# 注: KidBudget 里的 spec 文件名也是 2026-06-09 前缀的旧名
+# 注: <源项目> 里的 spec 文件名也是 <引入日期> 前缀的旧名
 # 先看一下源文件实际名字
-ls /Users/yangyang/Desktop/Github/KidBudget/docs/superpowers/specs/
+ls /Users/yangyang/Desktop/Github/<源项目>/docs/superpowers/specs/
 ```
 
-**如果源文件是 2026-06-09 前缀的旧名**(基于之前对话):先重命名为无日期版(应用 user feedback "无日期" 铁律):
+**如果源文件是 <引入日期> 前缀的旧名**(基于之前对话):先重命名为无日期版(应用 user feedback "无日期" 铁律):
 
 ```bash
-# 在 KidBudget 仓库内重命名
-cd /Users/yangyang/Desktop/Github/KidBudget
-git mv docs/superpowers/specs/2026-06-09-standard-process-template-design.md \
+# 在 <源项目> 仓库内重命名
+cd /Users/yangyang/Desktop/Github/<源项目>
+git mv docs/superpowers/specs/<引入日期>-standard-process-template-design.md \
        docs/superpowers/specs/standard-process-template-design.md
 
 # 再复制到 pm-template(用新名)
@@ -523,32 +523,32 @@ cp docs/superpowers/specs/standard-process-template-design.md \
    /Users/yangyang/Desktop/Github/pm-template/docs/superpowers/specs/standard-process-template-design.md
 ```
 
-- [ ] **Step 4.2: 验证零 KidBudget 内容 + commit**
+- [ ] **Step 4.2: 验证零 <源项目> 内容 + commit**
 
 ```bash
 cd /Users/yangyang/Desktop/Github/pm-template
-grep -E "KidBudget|yyitroad|2026-06-09" \
+grep -E "<源项目>|<签字人>|<引入日期>" \
    docs/superpowers/specs/standard-process-template-design.md
 # 预期:无输出(或仅允许的占位符)
 wc -l docs/superpowers/specs/standard-process-template-design.md
 # 预期:~600 行(原 spec 大小)
 git add docs/superpowers/specs/standard-process-template-design.md
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
-    commit -m "docs(specs): move process template design spec from KidBudget"
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
+    commit -m "docs(specs): move process template design spec from <源项目>"
 ```
 
-- [ ] **Step 4.3: 在 KidBudget 提交删除**
+- [ ] **Step 4.3: 在 <源项目> 提交删除**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/KidBudget
+cd /Users/yangyang/Desktop/Github/<源项目>
 git status
 # 预期:1 文件 renamed(从旧名到无日期名)或 1 文件 deleted
 git add -A  # 把所有变更 stage
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "docs(specs): move process template design spec to pm-template"
 ```
 
-**预期**: pm-template 1 commit + KidBudget 1 commit。
+**预期**: pm-template 1 commit + <源项目> 1 commit。
 
 ---
 
@@ -577,22 +577,22 @@ git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
 
 **必带**:🔒🟡⬜ 三级锁级 emoji(贯穿全文)
 **禁止**:
-- 任何 KidBudget 字样
-- 具体日期(2026-06-09 等)
+- 任何 <源项目> 字样
+- 具体日期(<引入日期> 等)
 - spec 自身的 commit 引用、迭代历史
 
 - [ ] **Step 5.2: 验证 + commit**
 
 ```bash
 cd /Users/yangyang/Desktop/Github/pm-template
-grep -E "KidBudget|2026-06-09|yyitroad" docs/process/tech_stack.md
+grep -E "<源项目>|<引入日期>|<签字人>" docs/process/tech_stack.md
 # 预期:无输出
 wc -l docs/process/tech_stack.md
 # 预期:~400-500 行
 grep -c "🔒" docs/process/tech_stack.md
 # 预期:≥ 20(L1 锁级项数)
 git add docs/process/tech_stack.md
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "docs(process): add standard tech stack spec (v1.0)"
 ```
 
@@ -652,14 +652,14 @@ grep "## 2.5 技术栈确认" docs/process/templates/00_charter.md
 grep -c "tech_stack.md" docs/process/templates/02_high_level_design.md
 grep -c "tech_stack.md" docs/process/templates/03_detailed_design.md
 # 预期:1 命中 / 1 命中 / 3 命中(§A/§B/§C)
-grep -E "KidBudget|2026-06-09|yyitroad" docs/process/templates/00_charter.md docs/process/templates/02_high_level_design.md docs/process/templates/03_detailed_design.md
+grep -E "<源项目>|<引入日期>|<签字人>" docs/process/templates/00_charter.md docs/process/templates/02_high_level_design.md docs/process/templates/03_detailed_design.md
 # 预期:无输出
 git add docs/process/templates/
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "feat(process): add tech stack confirmation to 3 phase templates"
 ```
 
-**预期**: 3 文件修改,1 commit。grep 计数对得上,无 KidBudget 残留。
+**预期**: 3 文件修改,1 commit。grep 计数对得上,无 <源项目> 残留。
 
 ---
 
@@ -702,10 +702,10 @@ grep -l "§2.5 技术栈确认" docs/process/dod/00_charter.md
 grep -l "L1 锁层" docs/process/dod/02_high_level_design.md
 grep -l "§3.6 §3.7" docs/process/dod/03_detailed_design.md
 # 三个 grep 都命中
-grep -E "KidBudget|2026-06-09|yyitroad" docs/process/dod/00_charter.md docs/process/dod/02_high_level_design.md docs/process/dod/03_detailed_design.md
+grep -E "<源项目>|<引入日期>|<签字人>" docs/process/dod/00_charter.md docs/process/dod/02_high_level_design.md docs/process/dod/03_detailed_design.md
 # 预期:无输出
 git add docs/process/dod/
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "feat(process): add tech stack DoD items to 3 phases"
 ```
 
@@ -742,18 +742,18 @@ cd /Users/yangyang/Desktop/Github/pm-template
 grep -l "L1 锁层" docs/process/critics/02_high_level_design.md
 grep -l "§3.3 数据层" docs/process/critics/03c_data_schema.md
 grep -l "Phase 0 §2.5" docs/process/critics/04_implementation.md
-grep -E "KidBudget|2026-06-09|yyitroad" docs/process/critics/02_high_level_design.md docs/process/critics/03c_data_schema.md docs/process/critics/04_implementation.md
+grep -E "<源项目>|<引入日期>|<签字人>" docs/process/critics/02_high_level_design.md docs/process/critics/03c_data_schema.md docs/process/critics/04_implementation.md
 # 三个 grep 命中,第四个无输出
 git add docs/process/critics/
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "feat(process): add tech stack critic checks to 3 phases"
 ```
 
 ---
 
-### Task 9: KidBudget 侧引用清理(7 文件)
+### Task 9: <源项目> 侧引用清理(7 文件)
 
-**Files in KidBudget:**
+**Files in <源项目>:**
 - Modify: `README.md`
 - Modify: `docs/00_charter.md`
 - Modify: `docs/01_requirements.md`
@@ -762,13 +762,13 @@ git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
 - Modify: `docs/03b_api_design.md`
 - Modify: `docs/03c_data_schema.md`
 
-**目标**: 把所有 `docs/process/...` 内部引用改为 `https://github.com/YyItRoad/pm-template/tree/main/docs/process/<...>` 形式(让 KidBudget 还能引用模板,但从外部 URL 拉取)。
+**目标**: 把所有 `docs/process/...` 内部引用改为 `https://github.com/YyItRoad/pm-template/tree/main/docs/process/<...>` 形式(让 <源项目> 还能引用模板,但从外部 URL 拉取)。
 
 - [ ] **Step 9.1: 替换 README.md 中"流程状态"段(1 处)**
 
 原文(`README.md:196`):
 ```markdown
-> **流程状态**: 本项目作为 [docs/process/](docs/process/README.md) 5 phase 流程的**试点**,所有 phase 标 [x] LEGACY(实施在 2026-06-09 前完成,未走 critic 自审)。试点后从下次大改动起严格走完整流程。详见 [`docs/process/STATE.md`](docs/process/STATE.md)。
+> **流程状态**: 本项目作为 [docs/process/](docs/process/README.md) 5 phase 流程的**试点**,所有 phase 标 [x] LEGACY(实施在 <引入日期> 前完成,未走 critic 自审)。试点后从下次大改动起严格走完整流程。详见 [`docs/process/STATE.md`](docs/process/STATE.md)。
 ```
 
 改为:
@@ -797,38 +797,38 @@ git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
 
 (具体每个文件的修改点用 Read + Edit 工具逐处改)
 
-- [ ] **Step 9.8: 验证 KidBudget 内无残留 `docs/process/` 内部引用**
+- [ ] **Step 9.8: 验证 <源项目> 内无残留 `docs/process/` 内部引用**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/KidBudget
+cd /Users/yangyang/Desktop/Github/<源项目>
 # docs/process/ 目录已被 move(若还没 move,先 Task 10)
 grep -rn "docs/process/" README.md docs/00_charter.md docs/01_requirements.md docs/02_high_level_design.md docs/03a_business_process.md docs/03b_api_design.md docs/03c_data_schema.md 2>&1
 # 预期:无输出(全部已改为 https:// 形式)
 ```
 
-- [ ] **Step 9.9: commit KidBudget 7 文件改动**
+- [ ] **Step 9.9: commit <源项目> 7 文件改动**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/KidBudget
+cd /Users/yangyang/Desktop/Github/<源项目>
 git add README.md docs/00_charter.md docs/01_requirements.md docs/02_high_level_design.md docs/03a_business_process.md docs/03b_api_design.md docs/03c_data_schema.md
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "docs: point process/ refs to pm-template GitHub URL"
 ```
 
-**预期**: KidBudget 1 commit,7 文件 modified。
+**预期**: <源项目> 1 commit,7 文件 modified。
 
 ---
 
-### Task 10: KidBudget 侧 docs/process/ 删除 + 功能说明.md 同步
+### Task 10: <源项目> 侧 docs/process/ 删除 + 功能说明.md 同步
 
-**Files in KidBudget:**
+**Files in <源项目>:**
 - Delete: 整个 `docs/process/` 目录(已被 move 走,现在显式 commit 删除)
 - Modify: `docs/功能说明.md`(可能含 docs/process/ 引用)
 
-- [ ] **Step 10.1: 验证 KidBudget 其它文件无 docs/process/ 引用**
+- [ ] **Step 10.1: 验证 <源项目> 其它文件无 docs/process/ 引用**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/KidBudget
+cd /Users/yangyang/Desktop/Github/<源项目>
 grep -rn "docs/process/" --include="*.md" --include="*.py" --include="*.sh" --include="*.yml" \
    --exclude-dir=docs/process --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=__pycache__ 2>&1
 # 预期:无输出(Task 9 已清理 phase 文档;此步检查其它文件)
@@ -839,13 +839,13 @@ grep -rn "docs/process/" --include="*.md" --include="*.py" --include="*.sh" --in
 - [ ] **Step 10.2: 删除 docs/process/ + commit**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/KidBudget
+cd /Users/yangyang/Desktop/Github/<源项目>
 git rm -r docs/process/
-git -c user.name="YyItRoad" -c user.email="yyitroad@users.noreply.github.com" \
+git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "docs: remove docs/process/ (moved to pm-template repo)"
 ```
 
-**预期**: KidBudget 1 commit,docs/process/ 整个目录删除。
+**预期**: <源项目> 1 commit,docs/process/ 整个目录删除。
 
 ---
 
@@ -868,11 +868,11 @@ find . -type f -not -path "./.git/*" | sort
 - 2 docs/superpowers/specs/(tech-stack + process-template)
 - 1 docs/superpowers/plans/
 
-- [ ] **Step 11.2: 全仓库零 KidBudget 内容验证**
+- [ ] **Step 11.2: 全仓库零 <源项目> 内容验证**
 
 ```bash
 cd /Users/yangyang/Desktop/Github/pm-template
-grep -rn "KidBudget\|yyitroad\|2026-06-09" \
+grep -rn "<源项目>\|<签字人>\|<引入日期>" \
    --exclude-dir=.git --exclude-dir=node_modules 2>&1
 # 预期:无输出(任何文件)
 ```
@@ -909,10 +909,10 @@ grep -q "v0.2.0" docs/process/CHANGELOG.md && echo "✓ process/CHANGELOG v0.2.0
 
 **预期**: 12 行 ✓。
 
-- [ ] **Step 11.4: KidBudget 侧无残留 docs/process/ 引用**
+- [ ] **Step 11.4: <源项目> 侧无残留 docs/process/ 引用**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/KidBudget
+cd /Users/yangyang/Desktop/Github/<源项目>
 test ! -d docs/process/ && echo "✓ docs/process/ 目录已删除"
 grep -rn "docs/process/" --include="*.md" --include="*.py" --include="*.sh" --include="*.yml" \
    --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=__pycache__ 2>&1 | head
@@ -926,17 +926,17 @@ echo "=== pm-template commits ==="
 cd /Users/yangyang/Desktop/Github/pm-template
 git log --oneline
 
-echo "=== KidBudget commits ==="
-cd /Users/yangyang/Desktop/Github/KidBudget
+echo "=== <源项目> commits ==="
+cd /Users/yangyang/Desktop/Github/<源项目>
 git log --oneline | head -5
 ```
 
 **pm-template 预期 11 commit**:
 ```
 chore: scaffold repo (LICENSE + README + .gitignore)
-docs(process): move 16 template/dod/critic files from KidBudget
+docs(process): move 16 template/dod/critic files from <源项目>
 docs(process): add pm-template-specific README/STATE/CHANGELOG
-docs(specs): move process template design spec from KidBudget
+docs(specs): move process template design spec from <源项目>
 docs(process): add standard tech stack spec (v1.0)
 feat(process): add tech stack confirmation to 3 phase templates
 feat(process): add tech stack DoD items to 3 phases
@@ -945,7 +945,7 @@ docs(pm-template): add standard tech stack design spec        ← 已存在的
 docs(pm-template): add tech stack implementation plan           ← 已存在的
 ```
 
-**KidBudget 预期新增 3 commit**:
+**<源项目> 预期新增 3 commit**:
 ```
 docs: point process/ refs to pm-template GitHub URL
 docs: remove docs/process/ (moved to pm-template repo)
@@ -961,10 +961,10 @@ git push -u origin main
 
 **预期**: 推送成功,GitHub 仓库 https://github.com/YyItRoad/pm-template 显示 11 commit + 24 文档。
 
-- [ ] **Step 11.7: push KidBudget 到 GitHub**
+- [ ] **Step 11.7: push <源项目> 到 GitHub**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/KidBudget
+cd /Users/yangyang/Desktop/Github/<源项目>
 git push -u origin main
 ```
 
@@ -983,12 +983,12 @@ git push -u origin main
 
 ### pm-template
 - [ ] 27 文件全部到位(Task 11.1)
-- [ ] **全仓库零 KidBudget / yyitroad / 2026-06-09 引用**(Task 11.2)
+- [ ] **全仓库零 <源项目> / <签字人> / <引入日期> 引用**(Task 11.2)
 - [ ] 12 处改动(tech_stack.md + 3 templates + 3 DoD + 3 critic + process README/CHANGELOG)全部到位(Task 11.3)
 - [ ] Git log 11 commit 按预期顺序(Task 11.5)
 - [ ] push 成功 + "Use this template" 按钮可点(Task 11.6/11.8)
 
-### KidBudget
+### <源项目>
 - [ ] `docs/process/` 目录被删除(Task 11.4)
 - [ ] 7 phase 文档 + README 引用全部改 pm-template URL(Task 9)
 - [ ] 其它文件无残留 docs/process/ 引用(Task 10.1)

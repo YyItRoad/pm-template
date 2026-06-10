@@ -4,9 +4,9 @@
 只有本脚本可写。
 
 CLI 用法:
-    python scripts/migrate_legacy_state.py <project_root>           # 交互模式
-    python scripts/migrate_legacy_state.py <project_root> --all     # 全部 phase 标 LEGACY
-    python scripts/migrate_legacy_state.py <project_root> --phase 0  # 只标 phase 0
+    python .claude/scripts/migrate_legacy_state.py <project_root>           # 交互模式
+    python .claude/scripts/migrate_legacy_state.py <project_root> --all     # 全部 phase 标 LEGACY
+    python .claude/scripts/migrate_legacy_state.py <project_root> --phase 0  # 只标 phase 0
 """
 
 from __future__ import annotations

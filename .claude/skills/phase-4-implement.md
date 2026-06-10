@@ -39,7 +39,7 @@ description: 按 03b 接口 + 03c 表 + 01 故事 + AC 写代码 + e2e,跑 criti
 ### 2. 标记 in-progress
 
 ```bash
-python3 scripts/update_state.py --phase 4 --status "[~]"
+python3 .claude/scripts/update_state.py --phase 4 --status "[~]"
 ```
 
 ### 3. 拉设计资产(spec §13 骨架)
@@ -153,7 +153,7 @@ done < /tmp/ac_list.txt
 ### 9. 锁
 
 ```bash
-python3 scripts/update_state.py \
+python3 .claude/scripts/update_state.py \
   --phase 4 \
   --status "[x]" \
   --signed-by "<name>" \

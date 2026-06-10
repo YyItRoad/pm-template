@@ -42,7 +42,7 @@ Phase 2 不是 `[x]` → 报 `ERR_PHASE_LOCKED_BY_UPSTREAM`。
 ### 2. 标记 in-progress
 
 ```bash
-python3 scripts/update_state.py --phase 3 --status "[~]"
+python3 .claude/scripts/update_state.py --phase 3 --status "[~]"
 ```
 
 ### 3. 引导填 3 个子产物
@@ -121,7 +121,7 @@ CRITICAL/HIGH → 停下等改。MEDIUM → 提示但可继续。
 ### 6. 锁
 
 ```bash
-python3 scripts/update_state.py \
+python3 .claude/scripts/update_state.py \
   --phase 3 \
   --status "[x]" \
   --signed-by "<name>" \

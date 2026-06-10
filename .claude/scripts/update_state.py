@@ -4,8 +4,8 @@
 状态机定义见 `docs/superpowers/specs/pm-template-skill-ization-design.md` §4.1。
 
 CLI 用法:
-    python scripts/update_state.py --phase 0 --status "[x]" --signed-by "Alice" --signed-at "2026-06-10"
-    python scripts/update_state.py --check  # 只解析 STATE.md,打印当前状态表
+    python .claude/scripts/update_state.py --phase 0 --status "[x]" --signed-by "Alice" --signed-at "2026-06-10"
+    python .claude/scripts/update_state.py --check  # 只解析 STATE.md,打印当前状态表
 """
 
 from __future__ import annotations

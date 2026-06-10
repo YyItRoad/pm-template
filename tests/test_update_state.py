@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-# 让 import 找到 scripts/
-SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
+# 让 import 找到 .claude/scripts/
+SCRIPTS = Path(__file__).resolve().parent.parent / ".claude" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from update_state import (  # noqa: E402

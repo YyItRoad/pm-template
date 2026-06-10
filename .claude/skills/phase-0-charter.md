@@ -48,7 +48,7 @@ git -C . rev-parse HEAD 2>/dev/null || git -C vendor/pm-template rev-parse HEAD
 
 如果 Phase 0 当前是 `[ ]`:
 ```bash
-python3 scripts/update_state.py --phase 0 --status "[~]"
+python3 .claude/scripts/update_state.py --phase 0 --status "[~]"
 ```
 
 不阻塞主流程,只是把 STATE.md 留个"进行中"痕迹,防止 `Ctrl+C` 后看不出在干啥。
@@ -125,7 +125,7 @@ MEDIUM > 0 → 提示"建议修但非阻塞,继续请明示"。
 ### 9. 锁
 
 ```bash
-python3 scripts/update_state.py \
+python3 .claude/scripts/update_state.py \
   --phase 0 \
   --status "[x]" \
   --signed-by "<name>" \

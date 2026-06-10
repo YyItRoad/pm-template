@@ -42,7 +42,7 @@
 
 ## 关键约束(所有 skill 遵守)
 
-- **写 STATE.md 必须走唯一 helper `update_state()`**(9 skill 共用,见 `scripts/update_state.py`)。
+- **写 STATE.md 必须走唯一 helper `update_state()`**(9 skill 共用,见 `.claude/scripts/update_state.py`)。
 - **只读** `docs/process/templates/` `dod/` `critics/` `tech_stack.md` 资产,不修改模板本身。
 - **每个 phase 锁前必须 sign-off**:用户明示 `y/n/c`,skill 不替用户锁(详 spec §3.2 / §12)。
 - **启动时做版本对齐检查**:`/state` + 每 phase skill 启动时,对比 `STATE.md` 记录的 `template_sha` vs pm-template git SHA,不一致就 warn(详 spec §6.3)。

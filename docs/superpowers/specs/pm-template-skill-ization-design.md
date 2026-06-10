@@ -207,7 +207,7 @@ Claude Code 会话
 ### 4.2 唯一写 STATE.md 的 helper
 
 ```python
-# 位置: pm-template/scripts/update_state.py
+# 位置: pm-template/.claude/scripts/update_state.py
 # 9 skill 通过 `from update_state import update_state` 引用
 # 路径相对 <pm-template root>,子项目通过 `git submodule` 或 pip 路径解析
 
@@ -337,21 +337,21 @@ pm-template/                           ← 现有结构不变
 │   └── superpowers/                   ← 现有
 │       ├── specs/                     ← 加:本 spec
 │       └── plans/                     ← 加:skill 实施 plan
-├── scripts/                           ← 新增
-│   ├── update_state.py                ← 共享 helper(§4.2)
-│   └── migrate_legacy_state.py        ← 写 [x] LEGACY 专用
-└── .claude/                           ← 新增
-    └── skills/                        ← 新增(9 skill + 1 readme)
-        ├── README.md
-        ├── new-project.md
-        ├── phase-0-charter.md
-        ├── phase-1-requirements.md
-        ├── phase-2-design.md
-        ├── phase-3-detail.md
-        ├── phase-4-implement.md
-        ├── state.md
-        ├── critic.md
-        └── dod-check.md
+├── .claude/                           ← 新增
+    ├── skills/                        ← 新增(9 skill + 1 readme)
+    │   ├── README.md
+    │   ├── new-project.md
+    │   ├── phase-0-charter.md
+    │   ├── phase-1-requirements.md
+    │   ├── phase-2-design.md
+    │   ├── phase-3-detail.md
+    │   ├── phase-4-implement.md
+    │   ├── state.md
+    │   ├── critic.md
+    │   └── dod-check.md
+    └── scripts/                       ← 新增
+        ├── update_state.py            ← 共享 helper(§4.2)
+        └── migrate_legacy_state.py    ← 写 [x] LEGACY 专用
 ```
 
 **pm-template 仓库增 14 文件** = 10 (9 skill + 1 skill README) + 1 spec + 1 plan + 2 scripts。

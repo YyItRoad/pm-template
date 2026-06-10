@@ -132,7 +132,7 @@ python3 .claude/scripts/update_state.py \
   --signed-at "<YYYY-MM-DD>" \
   --critic-report-path "docs/process/critics/reports/00_charter_<YYYY-MM-DD>.md" \
   --dod-count "12/12" \
-  --template-sha "<pm-template 当前 HEAD SHA>"
+  --template-sha "<pm-template root HEAD SHA>"
 ```
 
 输出 `✓ update_state(phase=0, status='[x]') 成功` + diff。

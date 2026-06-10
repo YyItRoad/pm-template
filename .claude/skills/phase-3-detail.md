@@ -128,7 +128,7 @@ python3 .claude/scripts/update_state.py \
   --signed-at "<YYYY-MM-DD>" \
   --critic-report-path "docs/process/critics/reports/03a_*.md,03b_*.md,03c_*.md" \
   --dod-count "<M>/<M>" \
-  --template-sha "<pm-template HEAD SHA>"
+  --template-sha "<pm-template root HEAD SHA>"
 ```
 
 ### 7. 提示下一步

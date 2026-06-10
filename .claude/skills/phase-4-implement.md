@@ -160,7 +160,7 @@ python3 .claude/scripts/update_state.py \
   --signed-at "<YYYY-MM-DD>" \
   --critic-report-path "docs/process/critics/reports/04_implementation_<YYYY-MM-DD>.md" \
   --dod-count "<M>/<M>" \
-  --template-sha "<pm-template HEAD SHA>"
+  --template-sha "<pm-template root HEAD SHA>"
 ```
 
 ### 10. 提示结束

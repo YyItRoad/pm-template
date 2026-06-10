@@ -91,14 +91,14 @@ pm-template/
 ### Task 1: pm-template 仓库根基础文件
 
 **Files:**
-- Create: `/Users/yangyang/Desktop/Github/pm-template/LICENSE`
-- Create: `/Users/yangyang/Desktop/Github/pm-template/README.md`
-- Create: `/Users/yangyang/Desktop/Github/pm-template/.gitignore`
+- Create: `LICENSE`
+- Create: `README.md`
+- Create: `.gitignore`
 
 - [ ] **Step 1.1: 写 LICENSE(MIT,pm-template 自己)**
 
 ```bash
-cat > /Users/yangyang/Desktop/Github/pm-template/LICENSE <<'EOF'
+cat > LICENSE <<'EOF'
 MIT License
 
 Copyright (c) YyItRoad
@@ -190,7 +190,7 @@ MIT — 详见 [LICENSE](LICENSE)
 pm-template 是纯文档仓库,但**也**是 GitHub Template Repository 起点,新项目 clone 后 gitignore 是干净起点,所以给一份常见语言的占位:
 
 ```bash
-cat > /Users/yangyang/Desktop/Github/pm-template/.gitignore <<'EOF'
+cat > .gitignore <<'EOF'
 # 模板仓库的 .gitignore 占位
 # 实际项目("Use this template" 后)按需扩展
 
@@ -225,7 +225,7 @@ EOF
 - [ ] **Step 1.4: 验证 + commit**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 ls -la LICENSE README.md .gitignore
 git add LICENSE README.md .gitignore
 git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
@@ -247,40 +247,40 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 - [ ] **Step 2.1: 从 <源项目> 复制 16 文件到 pm-template**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 mkdir -p docs/process/templates docs/process/dod docs/process/critics/reports
 
 # templates/ (4 文件,无 04)
 for f in 00_charter 01_requirements 02_high_level_design 03_detailed_design; do
-  cp /Users/yangyang/Desktop/Github/<源项目>/docs/process/templates/${f}.md \
+  cp <源项目-root>/docs/process/templates/${f}.md \
      docs/process/templates/${f}.md
 done
 
 # dod/ (5 文件)
 for f in 00_charter 01_requirements 02_high_level_design 03_detailed_design 04_implementation; do
-  cp /Users/yangyang/Desktop/Github/<源项目>/docs/process/dod/${f}.md \
+  cp <源项目-root>/docs/process/dod/${f}.md \
      docs/process/dod/${f}.md
 done
 
 # critics/ (7 文件 + .gitkeep)
 for f in 00_charter 01_requirements 02_high_level_design 03a_business_process 03b_api_design 03c_data_schema 04_implementation; do
-  cp /Users/yangyang/Desktop/Github/<源项目>/docs/process/critics/${f}.md \
+  cp <源项目-root>/docs/process/critics/${f}.md \
      docs/process/critics/${f}.md
 done
-cp /Users/yangyang/Desktop/Github/<源项目>/docs/process/critics/reports/.gitkeep \
+cp <源项目-root>/docs/process/critics/reports/.gitkeep \
    docs/process/critics/reports/.gitkeep
 ```
 
 - [ ] **Step 2.2: 验证内容完整性(零内容改动)**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 # 这些文件在 <源项目> 是纯模板,pm-template 拿过来应逐字节一致
-diff -r /Users/yangyang/Desktop/Github/<源项目>/docs/process/templates/ \
+diff -r <源项目-root>/docs/process/templates/ \
         docs/process/templates/
-diff -r /Users/yangyang/Desktop/Github/<源项目>/docs/process/dod/ \
+diff -r <源项目-root>/docs/process/dod/ \
         docs/process/dod/
-diff -r /Users/yangyang/Desktop/Github/<源项目>/docs/process/critics/ \
+diff -r <源项目-root>/docs/process/critics/ \
         docs/process/critics/
 # 预期:无任何 diff 输出
 ```
@@ -288,7 +288,7 @@ diff -r /Users/yangyang/Desktop/Github/<源项目>/docs/process/critics/ \
 - [ ] **Step 2.3: 验证零 <源项目> 内容**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 grep -r "<源项目>" docs/process/templates/ docs/process/dod/ docs/process/critics/ 2>&1
 # 预期:无输出
 ```
@@ -296,7 +296,7 @@ grep -r "<源项目>" docs/process/templates/ docs/process/dod/ docs/process/cri
 - [ ] **Step 2.4: commit 到 pm-template**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 git add docs/process/templates/ docs/process/dod/ docs/process/critics/
 git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "docs(process): move 16 template/dod/critic files from <源项目>"
@@ -402,7 +402,7 @@ docs/process/
 - [ ] **Step 3.2: 写 docs/process/STATE.md(空模板)**
 
 ```bash
-cat > /Users/yangyang/Desktop/Github/pm-template/docs/process/STATE.md <<'EOF'
+cat > docs/process/STATE.md <<'EOF'
 # 流程流转状态
 
 > 锁定状态: [ ] 未开始 / [~] 进行中 / [x] 已锁 / [SKIP] / [UNLOCKED] / [x] LEGACY
@@ -481,7 +481,7 @@ EOF
 - [ ] **Step 3.4: 验证零 <源项目> 内容 + commit**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 grep -E "<源项目>|<签字人>" docs/process/README.md docs/process/STATE.md docs/process/CHANGELOG.md
 # 预期:无输出
 git add docs/process/README.md docs/process/STATE.md docs/process/CHANGELOG.md
@@ -502,31 +502,31 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 - [ ] **Step 4.1: 复制 + 验证**
 
 ```bash
-cp /Users/yangyang/Desktop/Github/<源项目>/docs/superpowers/specs/standard-process-template-design.md \
-   /Users/yangyang/Desktop/Github/pm-template/docs/superpowers/specs/standard-process-template-design.md
+cp <源项目-root>/docs/superpowers/specs/standard-process-template-design.md \
+   docs/superpowers/specs/standard-process-template-design.md
 
 # 注: <源项目> 里的 spec 文件名也是 <引入日期> 前缀的旧名
 # 先看一下源文件实际名字
-ls /Users/yangyang/Desktop/Github/<源项目>/docs/superpowers/specs/
+ls <源项目-root>/docs/superpowers/specs/
 ```
 
 **如果源文件是 <引入日期> 前缀的旧名**(基于之前对话):先重命名为无日期版(应用 user feedback "无日期" 铁律):
 
 ```bash
 # 在 <源项目> 仓库内重命名
-cd /Users/yangyang/Desktop/Github/<源项目>
+cd <源项目>
 git mv docs/superpowers/specs/<引入日期>-standard-process-template-design.md \
        docs/superpowers/specs/standard-process-template-design.md
 
 # 再复制到 pm-template(用新名)
 cp docs/superpowers/specs/standard-process-template-design.md \
-   /Users/yangyang/Desktop/Github/pm-template/docs/superpowers/specs/standard-process-template-design.md
+   docs/superpowers/specs/standard-process-template-design.md
 ```
 
 - [ ] **Step 4.2: 验证零 <源项目> 内容 + commit**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 grep -E "<源项目>|<签字人>|<引入日期>" \
    docs/superpowers/specs/standard-process-template-design.md
 # 预期:无输出(或仅允许的占位符)
@@ -540,7 +540,7 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 - [ ] **Step 4.3: 在 <源项目> 提交删除**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/<源项目>
+cd <源项目>
 git status
 # 预期:1 文件 renamed(从旧名到无日期名)或 1 文件 deleted
 git add -A  # 把所有变更 stage
@@ -555,7 +555,7 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 ### Task 5: 创建 tech_stack.md
 
 **Files:**
-- Create: `/Users/yangyang/Desktop/Github/pm-template/docs/process/tech_stack.md`
+- Create: `docs/process/tech_stack.md`
 
 - [ ] **Step 5.1: 写 tech_stack.md(按 spec §3 完整 9 节)**
 
@@ -584,7 +584,7 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 - [ ] **Step 5.2: 验证 + commit**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 grep -E "<源项目>|<引入日期>|<签字人>" docs/process/tech_stack.md
 # 预期:无输出
 wc -l docs/process/tech_stack.md
@@ -647,7 +647,7 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 - [ ] **Step 6.4: 验证 + commit**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 grep "## 2.5 技术栈确认" docs/process/templates/00_charter.md
 grep -c "tech_stack.md" docs/process/templates/02_high_level_design.md
 grep -c "tech_stack.md" docs/process/templates/03_detailed_design.md
@@ -697,7 +697,7 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 - [ ] **Step 7.4: 验证 + commit**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 grep -l "§2.5 技术栈确认" docs/process/dod/00_charter.md
 grep -l "L1 锁层" docs/process/dod/02_high_level_design.md
 grep -l "§3.6 §3.7" docs/process/dod/03_detailed_design.md
@@ -738,7 +738,7 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 - [ ] **Step 8.4: 验证 + commit**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 grep -l "L1 锁层" docs/process/critics/02_high_level_design.md
 grep -l "§3.3 数据层" docs/process/critics/03c_data_schema.md
 grep -l "Phase 0 §2.5" docs/process/critics/04_implementation.md
@@ -800,7 +800,7 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 - [ ] **Step 9.8: 验证 <源项目> 内无残留 `docs/process/` 内部引用**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/<源项目>
+cd <源项目>
 # docs/process/ 目录已被 move(若还没 move,先 Task 10)
 grep -rn "docs/process/" README.md docs/00_charter.md docs/01_requirements.md docs/02_high_level_design.md docs/03a_business_process.md docs/03b_api_design.md docs/03c_data_schema.md 2>&1
 # 预期:无输出(全部已改为 https:// 形式)
@@ -809,7 +809,7 @@ grep -rn "docs/process/" README.md docs/00_charter.md docs/01_requirements.md do
 - [ ] **Step 9.9: commit <源项目> 7 文件改动**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/<源项目>
+cd <源项目>
 git add README.md docs/00_charter.md docs/01_requirements.md docs/02_high_level_design.md docs/03a_business_process.md docs/03b_api_design.md docs/03c_data_schema.md
 git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "docs: point process/ refs to pm-template GitHub URL"
@@ -828,7 +828,7 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 - [ ] **Step 10.1: 验证 <源项目> 其它文件无 docs/process/ 引用**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/<源项目>
+cd <源项目>
 grep -rn "docs/process/" --include="*.md" --include="*.py" --include="*.sh" --include="*.yml" \
    --exclude-dir=docs/process --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=__pycache__ 2>&1
 # 预期:无输出(Task 9 已清理 phase 文档;此步检查其它文件)
@@ -839,7 +839,7 @@ grep -rn "docs/process/" --include="*.md" --include="*.py" --include="*.sh" --in
 - [ ] **Step 10.2: 删除 docs/process/ + commit**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/<源项目>
+cd <源项目>
 git rm -r docs/process/
 git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com" \
     commit -m "docs: remove docs/process/ (moved to pm-template repo)"
@@ -854,7 +854,7 @@ git -c user.name="YyItRoad" -c user.email="<签字人>@users.noreply.github.com"
 - [ ] **Step 11.1: pm-template 文件结构验证**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 find . -type f -not -path "./.git/*" | sort
 ```
 
@@ -871,7 +871,7 @@ find . -type f -not -path "./.git/*" | sort
 - [ ] **Step 11.2: 全仓库零 <源项目> 内容验证**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 grep -rn "<源项目>\|<签字人>\|<引入日期>" \
    --exclude-dir=.git --exclude-dir=node_modules 2>&1
 # 预期:无输出(任何文件)
@@ -882,7 +882,7 @@ grep -rn "<源项目>\|<签字人>\|<引入日期>" \
 - [ ] **Step 11.3: 9 处改动全部到位**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 
 # 1. tech_stack.md 存在
 test -f docs/process/tech_stack.md && echo "✓ tech_stack.md"
@@ -912,7 +912,7 @@ grep -q "v0.2.0" docs/process/CHANGELOG.md && echo "✓ process/CHANGELOG v0.2.0
 - [ ] **Step 11.4: <源项目> 侧无残留 docs/process/ 引用**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/<源项目>
+cd <源项目>
 test ! -d docs/process/ && echo "✓ docs/process/ 目录已删除"
 grep -rn "docs/process/" --include="*.md" --include="*.py" --include="*.sh" --include="*.yml" \
    --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=__pycache__ 2>&1 | head
@@ -923,11 +923,11 @@ grep -rn "docs/process/" --include="*.md" --include="*.py" --include="*.sh" --in
 
 ```bash
 echo "=== pm-template commits ==="
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 git log --oneline
 
 echo "=== <源项目> commits ==="
-cd /Users/yangyang/Desktop/Github/<源项目>
+cd <源项目>
 git log --oneline | head -5
 ```
 
@@ -955,7 +955,7 @@ docs(specs): move process template design spec to pm-template
 - [ ] **Step 11.6: push pm-template 到 GitHub**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/pm-template
+cd pm-template
 git push -u origin main
 ```
 
@@ -964,7 +964,7 @@ git push -u origin main
 - [ ] **Step 11.7: push <源项目> 到 GitHub**
 
 ```bash
-cd /Users/yangyang/Desktop/Github/<源项目>
+cd <源项目>
 git push -u origin main
 ```
 

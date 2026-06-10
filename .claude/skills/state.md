@@ -64,7 +64,7 @@ STATE.md: <绝对路径>
 额外跑:
 ```bash
 # 对比 STATE.md 记录的 template_sha vs pm-template git HEAD SHA
-git -C <pm-template 根> rev-parse HEAD
+git -C <pm-template root> rev-parse HEAD
 ```
 
 或当 pm-template 是子项目 `vendor/pm-template` 时:

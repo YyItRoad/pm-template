@@ -18,6 +18,12 @@
 > 每个 type 必填的段,**段标 [必填] 不可缺**,空 = critic CRITICAL。
 > [可选] 段整段不写 = 合法的"跳过"用法,**挂占位符 ___** = ERR_OPTIONAL_SECTION_FILLED_BUT_BLANK
 
+> **段号说明**:type 模板的 §1.x 段号在 _base 之下,**不必连续**也**不必对齐**——
+> hotfix 用 §1.1-1.4(4 段),doc 用 §1.1-1.3(3 段),bugfix 用 §1.1-1.5(5 段),
+> feature / refactor 用 §1.1-1.6(6 段)。
+> 新加 type 时按需定段号,但 §10 签字必含(type 模板决定签字人数)。
+> 详细段号在 type 模板的 `§10 critic + 签字` 段。
+
 > 详细内容见 type 模板(`docs/process/templates/change/<type>.md`)。
 
 ## §9 关联引用(可选用,起草人填)

@@ -99,7 +99,7 @@ CRITICAL/HIGH → 停下等改。MEDIUM → 提示但可继续。
 - 完整 path / method / 入参 JSON Schema / 出参 JSON Schema / 错误码表
 - 每个接口对应 Phase 1 AC 编号(便于 Phase 4 critic 做 AC 覆盖)
 - 接口分组(webhook / 管理端 / 内部)
-- **必含 anchor** `<!-- ANCHOR: api-list -->`,接口清单 7 列必填(ID/方法/路径/鉴权/请求体/响应体/错误码),缺列 = HIGH
+- **必含 anchor** `<!-- ANCHOR: api-list -->`,接口清单总表 8 列必填(编号/路径/方法/鉴权依赖/错误码清单/幂等策略/限频策略/对应 AC),与模板 §B.1 一致;每接口详情表 7 列必填(路径方法/鉴权依赖/入参/出参/错误码/幂等/限频)。缺列 = HIGH
 
 填完跑:
 ```bash

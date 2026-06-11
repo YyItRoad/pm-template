@@ -45,6 +45,13 @@ pm-template 是一个**可复用资产仓库**,为 **web 应用(后端业务层 
 
 变更 spec 独立于 5 phase 状态机,详见 spec §4.5。
 
+## 跨切面:ADR + Release
+
+- **`/decision <title>`** — 写架构决策记录到 `docs/decisions/NNNN-<title>.md`(贯穿项目全程)
+- **`/release vX.Y.Z`** — 把所有 `[x]` 变更聚合成 1 个 release,写 `docs/releases.md` 一行(轻量,不强制 critic)
+
+详见 [.claude/skills/decision/SKILL.md](.claude/skills/decision/SKILL.md) 与 [.claude/skills/release/SKILL.md](.claude/skills/release/SKILL.md)。
+
 ## 适用
 
 | ✅ 适用 | ❌ 不适用 |

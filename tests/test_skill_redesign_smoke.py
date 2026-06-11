@@ -717,3 +717,90 @@ def test_charter_template_role_table_aligned_with_dod() -> None:
     assert len(table_rows) >= 4, (
         f"模板 §3 表格行数不足(当前 {len(table_rows)} 行,含 header + ≥2 data)"
     )
+
+
+# ===== P2 修复守护 =====
+
+
+def test_release_template_marks_example_block() -> None:
+    """release.md 模板必把 v0.11.0 段标为"示例",真发布时整段删。"""
+    text = (REPO_ROOT / "docs" / "process" / "templates" / "release.md").read_text(encoding="utf-8")
+    assert "BEGIN EXAMPLE" in text, "release.md 缺 BEGIN EXAMPLE 标注"
+    assert "END EXAMPLE" in text, "release.md 缺 END EXAMPLE 标注"
+    assert "示例" in text or "example" in text.lower(), "release.md 缺示例明示"
+
+
+def test_03b_api_list_columns_aligned_across_skill_critic_template() -> None:
+    """03b 接口清单总表 8 列在 skill / critic / template 3 处必一致。
+
+    之前:skill/critic 写 7 列(含 请求体/响应体),template 写 8 列(含 错误码/幂等/限频)。
+    现在:3 处都按 template §B.1 的 8 列对齐(编号/路径/方法/鉴权/错误码/幂等/限频/对应 AC)。
+    """
+    skill = (REPO_ROOT / ".claude" / "skills" / "phase-3-detail" / "SKILL.md").read_text(encoding="utf-8")
+    critic = (REPO_ROOT / "docs" / "process" / "critics" / "03b_api_design.md").read_text(encoding="utf-8")
+    template = (REPO_ROOT / "docs" / "process" / "templates" / "03_detailed_design.md").read_text(encoding="utf-8")
+
+    expected_cols = ["编号", "路径", "方法", "鉴权依赖", "错误码清单", "幂等策略", "限频策略", "对应 AC"]
+    for col in expected_cols:
+        assert col in template, f"template 03 §B.1 缺列: {col}"
+        assert col in skill, f"skill phase-3 缺列: {col}"
+        assert col in critic, f"critic 03b 缺列: {col}"
+
+
+def test_decision_and_release_skills_exist_with_correct_frontmatter() -> None:
+    """decision / release 2 个 skill 文件必存在且 frontmatter 合规(Claude Code 识别)。"""
+    for name in ("decision", "release"):
+        f = REPO_ROOT / ".claude" / "skills" / name / "SKILL.md"
+        assert f.exists(), f"{name} skill 缺"
+        text = f.read_text(encoding="utf-8")
+        # frontmatter 必含 name + description
+        assert text.startswith("---\n"), f"{name} SKILL.md 缺 frontmatter"
+        assert f"name: {name}" in text, f"{name} frontmatter 缺 name: {name}"
+        assert "description:" in text, f"{name} frontmatter 缺 description"
+
+
+def test_decision_skill_references_decision_critic_and_dod() -> None:
+    """decision skill 内部调用的 critic / DoD 必存在(死链保护)。"""
+    critic = REPO_ROOT / "docs" / "process" / "critics" / "change" / "decision.md"
+    dod = REPO_ROOT / "docs" / "process" / "dod" / "change" / "decision.md"
+    assert critic.exists(), f"decision critic 缺: {critic}"
+    assert dod.exists(), f"decision DoD 缺: {dod}"
+
+
+def test_critic_and_dod_check_skills_support_decision_change() -> None:
+    """critic / dod-check 必含 `change/decision` 支持(decision skill 调用)。"""
+    critic = (REPO_ROOT / ".claude" / "skills" / "critic" / "SKILL.md").read_text(encoding="utf-8")
+    dod = (REPO_ROOT / ".claude" / "skills" / "dod-check" / "SKILL.md").read_text(encoding="utf-8")
+    assert "/critic change/decision" in critic, "critic 不支持 /critic change/decision"
+    assert "/dod-check change/decision" in dod, "dod-check 不支持 /dod-check change/decision"
+    assert "change/decision" in critic, "critic 模板路径表缺 change/decision"
+    assert "change/decision" in dod, "dod-check 模板路径表缺 change/decision"
+
+
+def test_change_base_template_documents_section_numbering() -> None:
+    """_base.md 必说明 §1.x 段号 type 模板可灵活(防后续 type 扩展混乱)。"""
+    text = (REPO_ROOT / "docs" / "process" / "templates" / "change" / "_base.md").read_text(encoding="utf-8")
+    assert "段号" in text, "_base.md 缺'段号'说明"
+    # 必解释段号不必连续
+    assert "不必连续" in text or "可灵活" in text or "按需" in text, (
+        "_base.md 必说明段号 type 模板可灵活"
+    )
+
+
+def test_skills_readme_mentions_all_13_skills() -> None:
+    """skills/README.md 必列全 13 个 skill(防漏挂导致 Claude Code 找不到)。"""
+    text = (REPO_ROOT / ".claude" / "skills" / "README.md").read_text(encoding="utf-8")
+    for name in (
+        "new-project", "phase-0-charter", "phase-1-requirements", "phase-2-design",
+        "phase-3-detail", "phase-4-implement", "state", "critic", "dod-check",
+        "unlock", "change", "decision", "release",
+    ):
+        assert name in text, f"skills/README.md 缺 skill: {name}"
+
+
+def test_root_readme_mentions_decision_and_release_entry_points() -> None:
+    """根 README.md 必提 /decision + /release 入口(防 spec 与 README 脱节)。"""
+    text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert "/decision" in text, "根 README 缺 /decision 入口"
+    assert "/release" in text, "根 README 缺 /release 入口"
+    assert "ADR" in text or "决策" in text, "根 README 缺 ADR 介绍"

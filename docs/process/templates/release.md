@@ -33,7 +33,8 @@
 
 <!-- 在此下方追加,最新的在最上面 -->
 
-## v0.11.0 — 2026-06-09
+<!-- BEGIN EXAMPLE — 真实发布时整段删除 -->
+## v0.11.0 — 2026-06-09(示例,真实发布时整段删除)
 
 **类型**:feature
 **包含变更**:#0001-feat-audit-log
@@ -45,3 +46,5 @@
 **回滚方案**:`git revert 94871c4` + 重 deploy
 **关联 ADR**:#0002-merge-budget-into-user
 **关联 5 phase 段**:Phase 1 §0.1 / Phase 3 §B.5
+<!-- END EXAMPLE -->
+

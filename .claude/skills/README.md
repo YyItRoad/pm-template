@@ -1,11 +1,11 @@
 # pm-template Skills
 
-> 10 个 Claude Code skill,把 pm-template 的 5-phase 流程 + tech_stack 资产从"死的文档"升级为"活的流程引擎"。
+> 13 个 Claude Code skill,把 pm-template 的 5-phase 流程 + tech_stack 资产从"死的文档"升级为"活的流程引擎"。
 > 设计 spec: [`docs/superpowers/specs/pm-template-skill-ization-design.md`](../../docs/superpowers/specs/pm-template-skill-ization-design.md)
 
 ---
 
-## 10 Skill 一览
+## 13 Skill 一览
 
 | # | Skill | 触发命令 | 职责 | 写 STATE.md |
 |---|---|---|---|---|
@@ -19,6 +19,11 @@
 | 8 | `critic.md` | `/critic <phase>` | 单跑 critic 模板,产报告存档 | 不写 |
 | 9 | `dod-check.md` | `/dod-check <phase>` | 单跑 DoD 勾选,缺啥报啥 | 不写 |
 | 10 | `unlock.md` | `/unlock <phase>` | 解锁 [x] phase + cascade 下游 | 写 [UNLOCKED] |
+| 11 | `change.md` | `/change <type> <name>` | 变更入口(feature/bugfix/refactor/hotfix/doc) | 写变更日志段 |
+| 12 | `decision.md` | `/decision <title>` | ADR 入口(架构决策记录,贯穿全程) | 写决策日志段 |
+| 13 | `release.md` | `/release vX.Y.Z` | 聚合 [x] 变更 → 1 个 release + tag | 不写(写 docs/releases.md) |
+
+> spec §2.1 原标"10 Skill",change 是 Batch A 加,decision / release 是 P2 #14 修复加,共 13。
 
 ## 推荐工作流
 

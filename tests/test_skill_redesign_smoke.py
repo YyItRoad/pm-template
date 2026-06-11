@@ -406,8 +406,8 @@ def test_change_number_skipping_deprecated() -> None:
 
 
 def test_change_skill_in_skill_list() -> None:
-    """.claude/skills/change.md 必存在。"""
-    assert (REPO_ROOT / ".claude" / "skills" / "change.md").exists()
+    """.claude/skills/change/SKILL.md 必存在(目录结构,Claude Code 发现约定)。"""
+    assert (REPO_ROOT / ".claude" / "skills" / "change" / "SKILL.md").exists()
 
 
 def test_all_5_change_templates_exist() -> None:

@@ -51,15 +51,18 @@ case "$TYPE" in
 esac
 ```
 
-**b) 检查 STATE.md 主 5 phase 至少 1 个 `[x]`**:
+**b) 检查 STATE.md 主 5 phase 至少 1 个 `[x]` 或 `[x] LEGACY`**:
 ```bash
 python3 -c "
 import sys
 sys.path.insert(0, '.claude/scripts')
 from update_state import find_state_file, parse_state, get_current_status
 st = parse_state(find_state_file())
-if not any(get_current_status(st[i]) == '[x]' for i in range(5)):
-    print('ERR_CHANGE_REQUIRES_GREENFIELD')
+locked = [get_current_status(st[i]) for i in range(5)]
+# 接受 [x] 和 [x] LEGACY(试点项目用 LEGACY)
+has_any_locked = any(s in ('[x]', '[x] LEGACY') for s in locked)
+if not has_any_locked:
+    print('ERR_CHANGE_REQUIRES_GREENFIELD (当前:', locked, ')')
     sys.exit(1)
 "
 ```

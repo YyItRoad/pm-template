@@ -90,7 +90,7 @@ artifact 缺失 → 报错"phase 产物未生成,无法自审"。
 ### CRITICAL
 1. §2.5 技术栈确认段未签字
    - 证据:`docs/00_charter.md` §2.5 末尾无 `[ ] 你本人签字: ___` 勾选
-   - 违反:`dod/00_charter.md` DoD-08
+   - 违反:`dod/00_charter.md` D0-12
 
 ### HIGH
 (none)
@@ -98,7 +98,7 @@ artifact 缺失 → 报错"phase 产物未生成,无法自审"。
 ### MEDIUM
 1. §3 角色清单列了 5 个角色但只填了 2 个
    - 证据:`docs/00_charter.md` §3 表格有 5 行,3 行内容为空
-   - 违反:`dod/00_charter.md` DoD-05
+   - 违反:`dod/00_charter.md` D0-04
 
 ### LOW
 (none)

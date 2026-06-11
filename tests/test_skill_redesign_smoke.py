@@ -806,6 +806,66 @@ def test_root_readme_mentions_decision_and_release_entry_points() -> None:
     assert "ADR" in text or "决策" in text, "根 README 缺 ADR 介绍"
 
 
+# ===== 二轮审计守护(critic/dod-check 引用 + spec 残留)=====
+
+
+def test_skill_examples_use_new_dod_numbering() -> None:
+    """critic / dod-check 的示例必用新 DoD 编号(D0-NN),不用旧 'DoD-01' ~ 'DoD-08'。
+
+    之前:P1 改 DoD 全局编号后,critic 报告示例还写 'DoD-08' / 'DoD-05',
+    实际 dod/00_charter.md 里没有 'DoD-08' 这种纯数字编号,引用错位。
+    """
+    critic = (REPO_ROOT / ".claude" / "skills" / "critic" / "SKILL.md").read_text(encoding="utf-8")
+    dod_check = (REPO_ROOT / ".claude" / "skills" / "dod-check" / "SKILL.md").read_text(encoding="utf-8")
+    # critic 示例块:必用 D0-NN 引用,不能用 DoD-0N
+    assert re.search(r"D0-\d{2}", critic), "critic 示例必用 D0-NN 编号引用 DoD"
+    assert not re.search(r"DoD-\d+\b", critic), (
+        "critic 仍含旧 'DoD-N' 编号(应改 D0-NN)"
+    )
+    # dod-check 示例必含 D0-NN
+    assert re.search(r"D0-\d{2}", dod_check), "dod-check 示例必用 D0-NN 编号"
+    assert not re.search(r"DoD-\d+\b", dod_check), (
+        "dod-check 仍含旧 'DoD-N' 编号(应改 D0-NN)"
+    )
+
+
+def test_spec_no_longer_claims_10_skills() -> None:
+    """spec 文件必不再 '10 skill' 字面声明(历史 10 表述除外)。
+
+    9 处原 '10 skill' 在二轮审计中已改:
+    - §范围: 10 skill → 13 skill
+    - §2.1 标题: '10 Skill 总览' → 'Skill 总览'
+    - §约束: '10 skill 只读' → '13 skill 只读'
+    - §代码示例: '10 skill 通过...' / '10 skill 共享' → 13
+    - §4.3 标题: '10 skill 与 STATE.md 的关系' → 13
+    - §文件树: '(10 skill + 1 readme)' → 13
+    - §文件数: '11 (10 skill + 1 skill README)' → 14
+    - §Verification: '10 skill 文件 frontmatter' → 13
+    - §范围历史: 'spec 最初标 10 skill' 保留(说明演化,不算声称)
+    """
+    spec = (REPO_ROOT / "docs" / "superpowers" / "specs" / "pm-template-skill-ization-design.md").read_text(encoding="utf-8")
+    # 不应再出现"10 skill"作为当前声称
+    for bad_phrase in (
+        "## 范围**: 10 skill",
+        "10 skill **只读**",
+        "10 skill 通过",
+        "10 skill 共享",
+        "### 4.3 10 skill",
+        "(10 skill + 1 readme)",
+        "(10 skill + 1 skill README)",
+        "10 skill 文件 frontmatter",
+    ):
+        assert bad_phrase not in spec, (
+            f"spec 仍含旧 '10 skill' 声明: {bad_phrase!r}"
+        )
+    # 应有 '13 skill' 当前声称
+    for good_phrase in (
+        "13 skill",
+        "Skill 总览",
+    ):
+        assert good_phrase in spec, f"spec 缺 '13 skill' 当前声称: {good_phrase!r}"
+
+
 # ===== skill / doc 一致性原则(用户提出,P2 + )=====
 
 

@@ -453,3 +453,134 @@ def test_todo_doc_lists_unimplemented_types() -> None:
     todo = (REPO_ROOT / "docs" / "process" / "TODO.md").read_text(encoding="utf-8")
     for t in ("upgrade", "perf", "migration", "deprecation"):
         assert t in todo, f"TODO.md 缺未实现 type: {t}"
+
+
+# ===== critic / dod-check 加 change/<type> 支持(P0 #3 修复)=====
+
+
+CHANGE_TYPES: tuple[str, ...] = ("feature", "bugfix", "refactor", "hotfix", "doc")
+
+
+def test_critic_skill_supports_all_5_change_types() -> None:
+    """critic/SKILL.md 触发段必含 5 个 change/<type>(否则 /change 死链)。"""
+    text = (REPO_ROOT / ".claude" / "skills" / "critic" / "SKILL.md").read_text(encoding="utf-8")
+    for t in CHANGE_TYPES:
+        assert f"/critic change/{t}" in text, f"critic 缺触发 /critic change/{t}"
+
+
+def test_critic_skill_template_path_table_covers_changes() -> None:
+    """critic/SKILL.md §1 模板路径表必含 5 个 change/<type> 映射。"""
+    text = (REPO_ROOT / ".claude" / "skills" / "critic" / "SKILL.md").read_text(encoding="utf-8")
+    for t in CHANGE_TYPES:
+        assert f"change/{t}" in text, f"critic 缺模板路径 change/{t}"
+
+
+def test_critic_skill_change_report_filename_convention() -> None:
+    """变更报告命名 change_<type>_YYYY-MM-DD.md,与 feature.md 模板里写的对齐。
+
+    SKILL.md 用具体示例(如 change_feature_2026-06-10.md)代替字面 YYYY-MM-DD 占位符。
+    """
+    text = (REPO_ROOT / ".claude" / "skills" / "critic" / "SKILL.md").read_text(encoding="utf-8")
+    # 文件里含模式串 "change_<type>_<date>.md"
+    assert "change_<type>_YYYY-MM-DD.md" in text, (
+        "critic 缺模式串 change_<type>_YYYY-MM-DD.md"
+    )
+    # 每个 type 至少有 1 个具体示例
+    for t in CHANGE_TYPES:
+        assert f"change_{t}_2026-" in text, f"critic 缺 type {t} 的具体日期示例"
+
+
+def test_dod_check_skill_supports_all_5_change_types() -> None:
+    """dod-check/SKILL.md 触发段必含 5 个 change/<type>(否则 /change 死链)。"""
+    text = (REPO_ROOT / ".claude" / "skills" / "dod-check" / "SKILL.md").read_text(encoding="utf-8")
+    for t in CHANGE_TYPES:
+        assert f"/dod-check change/{t}" in text, f"dod-check 缺触发 /dod-check change/{t}"
+
+
+def test_dod_check_skill_template_path_table_covers_changes() -> None:
+    """dod-check/SKILL.md §1 模板路径表必含 5 个 change/<type> 映射。"""
+    text = (REPO_ROOT / ".claude" / "skills" / "dod-check" / "SKILL.md").read_text(encoding="utf-8")
+    for t in CHANGE_TYPES:
+        assert f"change/{t}" in text, f"dod-check 缺模板路径 change/{t}"
+
+
+def test_change_skill_calls_consistent_critic_dod_syntax() -> None:
+    """change/SKILL.md 调 critic/dod-check 的语法必须和它们支持的语法一致。
+
+    之前 bug:change 调 /critic change/feature,但 critic 不支持,死链。
+
+    change/SKILL.md 用 `<type>` 占位符(非字面量),critic/dod-check 用具体 type 名。
+    """
+    change = (REPO_ROOT / ".claude" / "skills" / "change" / "SKILL.md").read_text(encoding="utf-8")
+    critic = (REPO_ROOT / ".claude" / "skills" / "critic" / "SKILL.md").read_text(encoding="utf-8")
+    dod = (REPO_ROOT / ".claude" / "skills" / "dod-check" / "SKILL.md").read_text(encoding="utf-8")
+    # change/SKILL.md 用占位符 `<type>`,要能找到调用模式
+    assert "/critic change/<type>" in change, "change 未调 /critic change/<type>"
+    assert "/dod-check change/<type>" in change, "change 未调 /dod-check change/<type>"
+    # critic/dod-check 必支持所有 5 个 type 字面量
+    for t in CHANGE_TYPES:
+        syntax = f"change/{t}"
+        assert f"/critic {syntax}" in critic, f"critic 未声明支持 /critic {syntax}"
+        assert f"/dod-check {syntax}" in dod, f"dod-check 未声明支持 /dod-check {syntax}"
+
+
+# ===== sys.path 一致性(P0 #2 修复)=====
+
+
+def test_phase_skills_use_dot_claude_scripts_path() -> None:
+    """所有 phase skill 调 update_state 的 sys.path 必是 .claude/scripts(不是 scripts)。
+
+    之前 bug:phase-0/1 + new-project 写 `sys.path.insert(0, 'scripts')`,从项目根跑会挂。
+    """
+    bad_files: list[str] = []
+    for rel in (
+        ".claude/skills/phase-0-charter/SKILL.md",
+        ".claude/skills/phase-1-requirements/SKILL.md",
+        ".claude/skills/phase-2-design/SKILL.md",
+        ".claude/skills/phase-3-detail/SKILL.md",
+        ".claude/skills/phase-4-implement/SKILL.md",
+        ".claude/skills/new-project/SKILL.md",
+        ".claude/skills/unlock/SKILL.md",
+        ".claude/skills/state/SKILL.md",
+        ".claude/skills/change/SKILL.md",
+    ):
+        text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+        # 找所有 sys.path.insert 写法
+        for line in text.splitlines():
+            stripped = line.strip()
+            if "sys.path.insert" in stripped and "'scripts'" in stripped and "'scripts/'" not in stripped and "'.claude/scripts'" not in stripped:
+                # 排除 "'.claude/scripts'" 已经正确的(可能 inline)
+                # 简单判断:含 'scripts' 单引号串,且不含 '.claude'
+                if "'.claude" not in stripped:
+                    bad_files.append(f"{rel}: {stripped}")
+    assert bad_files == [], (
+        "以下 skill 用了错误的 sys.path(应为 '.claude/scripts'):\n"
+        + "\n".join(bad_files)
+    )
+
+
+# ===== phase-4 硬 grep 路径错配修复(P0 #1)=====
+
+
+def test_phase4_skill_hard_grep_uses_correct_phase3_filenames() -> None:
+    """phase-4-implement/SKILL.md 硬 grep 段不能再用 `docs/03<key>_<anchor>.md` 的错配规则。
+
+    之前 bug:`file="docs/03${anchor_check%%:*}_${anchor_check##*:}.md"` 展开成
+    `docs/03a_process-1-normal.md`(实际是 `docs/03a_business_process.md`)。
+    """
+    text = (REPO_ROOT / ".claude/skills/phase-4-implement/SKILL.md").read_text(encoding="utf-8")
+    # 修复后必须含显式的 file 名映射
+    for required_file in (
+        "03a_business_process.md",
+        "03b_api_design.md",
+        "03c_data_schema.md",
+    ):
+        assert required_file in text, (
+            f"phase-4 硬 grep 缺正确 file 映射: {required_file}"
+        )
+    # 必须有 PHASE3_FILE_MAP 或等价的映射表
+    assert "PHASE3_FILE_MAP" in text or "case" in text, (
+        "phase-4 硬 grep 仍用错配的字符串拼接,未引入映射表"
+    )
+    # "示意逻辑" 占位符必须删除
+    assert "示意逻辑" not in text, "phase-4 仍含'示意逻辑'占位符注释,未真修复"

@@ -60,11 +60,17 @@ for f in docs/03a_business_process.md docs/03b_api_design.md docs/03c_data_schem
   fi
 done
 
-# Phase 3 必填 anchor 检查(03a/3b/3c)
+# Phase 3 必填 anchor 检查(03a/3b/3c),file 名映射按子 phase 分支
+declare -A PHASE3_FILE_MAP=(
+  ["03a"]="docs/03a_business_process.md"
+  ["03b"]="docs/03b_api_design.md"
+  ["03c"]="docs/03c_data_schema.md"
+)
 for anchor_check in "03a:process-1-normal" "03a:process-1-exception" "03b:api-list" "03c:tables"; do
-  file="docs/03${anchor_check%%:*}_${anchor_check##*:}.md"
-  # 注:实际 file 名映射略,这里示意逻辑
-  if ! grep -q "<!-- ANCHOR: ${anchor_check##*:} -->" "$file" 2>/dev/null; then
+  phase_key="${anchor_check%%:*}"
+  anchor_name="${anchor_check##*:}"
+  file="${PHASE3_FILE_MAP[$phase_key]}"
+  if [ -z "$file" ] || ! grep -q "<!-- ANCHOR: ${anchor_name} -->" "$file" 2>/dev/null; then
     MISSING+=("03:anchor-${anchor_check}")
   fi
 done
@@ -78,9 +84,6 @@ fi
 
 **为什么硬 grep**:phase 4 是写代码,如果上游任何一个 phase 产物缺失或 anchor
 没填,LLM 实现时会"凭想象"写无依据代码。硬 grep 强制上游真有合同。
-
-> **注**:03a/3b/3c 的 anchor 检查需根据实际 file 名映射(03a process-1-normal 对应
-> docs/03a_business_process.md,等等),实现时按需调整 grep 路径。
 
 ### 2. 标记 in-progress
 

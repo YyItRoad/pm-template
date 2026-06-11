@@ -923,3 +923,49 @@ def test_spec_contains_decision_and_release_design() -> None:
     # §十一 错误码加 release 错误
     assert "ERR_RELEASE_VERSION_INVALID" in spec, "spec 缺 ERR_RELEASE_VERSION_INVALID"
     assert "ERR_RELEASE_DUPLICATE" in spec, "spec 缺 ERR_RELEASE_DUPLICATE"
+
+
+# ===== 根 README 与最新状态同步 =====
+
+
+def test_root_readme_mentions_13_skills() -> None:
+    """根 README 必提 13 skills(防漏挂导致用户找不到)。"""
+    text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert "13" in text and "skill" in text.lower(), "根 README 缺 13 skills 介绍"
+    # 4 层结构
+    for layer in ("入口", "5 phase", "辅助", "维护期"):
+        assert layer in text, f"根 README 缺 skill 分层: {layer}"
+
+
+def test_root_readme_lists_all_3_cross_cutting_skills() -> None:
+    """根 README 必提 /change / /decision / /release 3 个维护期入口。"""
+    text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    for skill in ("/change", "/decision", "/release"):
+        assert skill in text, f"根 README 缺入口: {skill}"
+
+
+def test_root_readme_explains_dod_numbering() -> None:
+    """根 README 必提 DoD 编号方案(D0-NN / D1-NN 等),方便 critic 引用。"""
+    text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert "D0-NN" in text, "根 README 缺 DoD 编号方案"
+    assert "D1-NN" in text, "根 README 缺 D1-NN 示例"
+
+
+def test_root_readme_does_not_self_describe_as_only_entry() -> None:
+    """根 README 不应把 /new-project 写成'唯一入口'(维护期用 /change 等)。"""
+    text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert "/new-project" in text
+    # 不应有"new-project 唯一入口"这种过时描述
+    assert "new-project 唯一入口" not in text, "根 README 仍说 new-project 是'唯一入口'"
+
+
+def test_root_readme_does_not_leak_pm_template_in_self_description() -> None:
+    """根 README 标题 / 副标题不应 self-describe 为 'pm-template 的 X'。
+
+    之前:副标题写 'pm-template 是什么' 自指;现在改为通用描述。
+    但 'pm-template' 作为仓库名 / 项目名出现在描述里是 OK 的(事实引用)。
+    """
+    text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    # 取前 5 行(标题区),不应有自指
+    first_5 = "\n".join(text.splitlines()[:5])
+    assert "pm-template 的" not in first_5, "根 README 标题区 self-describe 为 'pm-template 的 X'"

@@ -584,3 +584,136 @@ def test_phase4_skill_hard_grep_uses_correct_phase3_filenames() -> None:
     )
     # "示意逻辑" 占位符必须删除
     assert "示意逻辑" not in text, "phase-4 仍含'示意逻辑'占位符注释,未真修复"
+
+
+# ===== P1 #4 / #5 / #8 修复:DoD 编号统一 + 角色清单对齐 + 边界场景行数对齐 =====
+
+
+# 5 phase + 5 change type 的 DoD 编号前缀(全局,无歧义)
+PHASE_DOD_PREFIXES: tuple[str, ...] = ("D0", "D1", "D2", "D3", "D4")
+CHANGE_DOD_PREFIXES: tuple[str, ...] = ("CF", "CB", "CR", "CH", "CD")
+ALL_DOD_PREFIXES: tuple[str, ...] = PHASE_DOD_PREFIXES + CHANGE_DOD_PREFIXES
+
+
+def _extract_dod_ids(text: str) -> list[str]:
+    """提取 markdown 文本里所有 `<PREFIX>-<NN>` DoD 编号。"""
+    # 用非捕获组 (?:...),否则 re.findall 只返捕获组内容(就只剩 D0 这种)
+    return re.findall(r"\b(?:D[0-4]|CF|CB|CR|CH|CD)-\d{2}\b", text)
+
+
+def test_all_dod_files_use_global_prefixed_numbering() -> None:
+    """所有 5 phase + 5 change DoD 文件必用全局前缀编号(D0-/D1-/.../CF-/CB-/...)。
+
+    之前:混用 `1.1 / 2.5 / A.1 / 无编号` 4 套,critic 跨文档引用 'DoD-XX' 无从查。
+    之后:`D0-01 / D1-01 / D2-01 / D3-01 / D4-01` 全局唯一 + `CF-01 / CB-01 / ...` 变更专用。
+    """
+    dod_files = (
+        "dod/00_charter.md",
+        "dod/01_requirements.md",
+        "dod/02_high_level_design.md",
+        "dod/03_detailed_design.md",
+        "dod/04_implementation.md",
+        "dod/change/feature.md",
+        "dod/change/bugfix.md",
+        "dod/change/refactor.md",
+        "dod/change/hotfix.md",
+        "dod/change/doc.md",
+    )
+    prefix_to_file = {
+        "D0": dod_files[0],
+        "D1": dod_files[1],
+        "D2": dod_files[2],
+        "D3": dod_files[3],
+        "D4": dod_files[4],
+        "CF": dod_files[5],
+        "CB": dod_files[6],
+        "CR": dod_files[7],
+        "CH": dod_files[8],
+        "CD": dod_files[9],
+    }
+    seen_prefixes: set[str] = set()
+    for rel in dod_files:
+        text = (REPO_ROOT / "docs" / "process" / rel).read_text(encoding="utf-8")
+        ids = _extract_dod_ids(text)
+        assert ids, f"{rel} 未含任何 D<N>-NN / CF-NN 编号"
+        # 同一文件只能用 1 个前缀(如 D0 文件全用 D0-,不混用)
+        prefixes_in_file = {i.split("-")[0] for i in ids}
+        assert len(prefixes_in_file) == 1, (
+            f"{rel} 混用多个前缀: {prefixes_in_file}"
+        )
+        # 该前缀的归属文件必须正确
+        prefix = prefixes_in_file.pop()
+        assert prefix_to_file[prefix] == rel, (
+            f"前缀 {prefix} 出现在 {rel},但归属是 {prefix_to_file[prefix]}"
+        )
+        seen_prefixes.add(prefix)
+        # 编号必连续(01, 02, 03 ... 不能跳号)
+        nums = sorted(int(i.split("-")[1]) for i in ids)
+        expected = list(range(1, len(nums) + 1))
+        assert nums == expected, (
+            f"{rel} 编号不连续: {nums} (期望 {expected})"
+        )
+    # 10 个前缀全用上
+    assert seen_prefixes == set(ALL_DOD_PREFIXES), (
+        f"未用到所有 DoD 前缀,用了: {seen_prefixes}"
+    )
+
+
+def test_critic_can_reference_dod_by_global_id() -> None:
+    """DoD ID 可被任意文件以 `<PREFIX>-<NN>` 形式精确引用。
+
+    验证:每个 phase DoD 的第 1 个编号,都符合 `<PREFIX>-01` 格式,可 grep 出来。
+    """
+    for prefix, rel in (
+        ("D0", "dod/00_charter.md"),
+        ("D1", "dod/01_requirements.md"),
+        ("D2", "dod/02_high_level_design.md"),
+        ("D3", "dod/03_detailed_design.md"),
+        ("D4", "dod/04_implementation.md"),
+    ):
+        text = (REPO_ROOT / "docs" / "process" / rel).read_text(encoding="utf-8")
+        ids = _extract_dod_ids(text)
+        assert f"{prefix}-01" in ids, f"{rel} 缺 {prefix}-01"
+
+
+def test_dod01_requirement_count_aligned_with_critic() -> None:
+    """DoD 01 边界场景行数要求必与 critic 01 对齐(均 ≥20)。
+
+    之前 bug:DoD 01 标 ≥5,critic 01 标 ≥20,产出可过 DoD 但被 critic CRITICAL,
+    形成"DoD 过 / critic 挂"死锁。P1 #8 修复:统一为 ≥20。
+    """
+    dod = (REPO_ROOT / "docs" / "process" / "dod" / "01_requirements.md").read_text(encoding="utf-8")
+    critic = (REPO_ROOT / "docs" / "process" / "critics" / "01_requirements.md").read_text(encoding="utf-8")
+    # DoD 01 必含 "≥20" 或 ">=20"
+    assert re.search(r"边界场景\s*≥\s*20|边界场景\s*>=\s*20", dod), (
+        "DoD 01 边界场景必填 ≥20 条(与 critic 对齐)"
+    )
+    # critic 01 也必含 "≥20"
+    assert re.search(r"边界场景.*≥\s*20|边界场景.*>=\s*20", critic), (
+        "critic 01 边界场景行数要求变了(应仍为 ≥20)"
+    )
+
+
+def test_charter_template_role_table_aligned_with_dod() -> None:
+    """charter 模板 §3 角色清单必 ≥2 行,且与 DoD 00 约束一致。
+
+    之前 bug:DoD 00 标 "≥2 行 + 空角色也算状态",模板只放 2 行空行但
+    不告诉起草人"空角色也算状态"→ 起草人不知道第 2 行该写啥。
+    P1 #4 修复:模板显式说"≥2 行"和"空角色也算"。
+    """
+    template = (REPO_ROOT / "docs" / "process" / "templates" / "00_charter.md").read_text(encoding="utf-8")
+    dod = (REPO_ROOT / "docs" / "process" / "dod" / "00_charter.md").read_text(encoding="utf-8")
+    # DoD 必含"≥2 行,空角色也算一种状态"
+    assert "≥2 行" in dod and "空角色也算" in dod, (
+        "DoD 00 缺'≥2 行,空角色也算一种状态'约束"
+    )
+    # 模板 §3 必显式提示 "≥2 行" 和 "空角色也算"
+    section_3 = template.split("## 3. 角色清单")[1].split("## ")[0] if "## 3. 角色清单" in template else ""
+    assert "≥2 行" in section_3, "模板 §3 缺'≥2 行'提示"
+    assert "空角色也算" in section_3, "模板 §3 缺'空角色也算'提示"
+    # 模板必给 ≥2 行表格
+    table_rows = [line for line in section_3.splitlines() if line.startswith("|") and "---" not in line]
+    # header + separator + ≥2 data rows = ≥4 行
+    assert len(table_rows) >= 4, (
+        f"模板 §3 表格行数不足(当前 {len(table_rows)} 行,含 header + ≥2 data)"
+    )

@@ -241,9 +241,14 @@ def check_required_kwargs(new_status: str, kwargs: dict[str, Any]) -> None:
 
 
 def atomic_write(path: Path, content: str) -> None:
-    """原子写文件(.tmp + rename),用 flock 防并发。"""
-    import fcntl
+    """原子写文件(.tmp + rename),POSIX 用 flock 防并发,Windows 退化为 no-op。"""
     import tempfile
+
+    try:
+        import fcntl  # type: ignore[import-not-found]
+        _HAS_FCNTL = True
+    except ImportError:  # Windows / 非 POSIX 系统
+        _HAS_FCNTL = False
 
     tmp_fd, tmp_path = tempfile.mkstemp(
         prefix=".STATE.", suffix=".tmp", dir=path.parent
@@ -251,10 +256,11 @@ def atomic_write(path: Path, content: str) -> None:
     try:
         with open(tmp_fd, "w", encoding="utf-8") as f:
             f.write(content)
-            try:
-                fcntl.flock(f, fcntl.LOCK_EX)
-            except (BlockingIOError, OSError) as e:
-                raise ConcurrentWriteError(f"文件锁失败: {e}")
+            if _HAS_FCNTL:
+                try:
+                    fcntl.flock(f, fcntl.LOCK_EX)  # type: ignore[possibly-undefined]
+                except (BlockingIOError, OSError) as e:
+                    raise ConcurrentWriteError(f"文件锁失败: {e}")
         Path(tmp_path).replace(path)
     except Exception:
         Path(tmp_path).unlink(missing_ok=True)

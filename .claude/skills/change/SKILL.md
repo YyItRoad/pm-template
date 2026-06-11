@@ -1,6 +1,6 @@
 ---
 name: change
-description: 对已存在项目做变更(feature/bugfix/refactor/hotfix/doc)的一等公民入口。基于已锁 5 phase,增量追加变更记录,不重跑基础设计。变更日志写 STATE.md"变更日志"段。
+description: 维护期变更入口(feature/bugfix/refactor/hotfix/doc 5 type)。基于已锁 5 phase,增量追加变更记录,不重跑基础设计。变更日志写 STATE.md"变更日志"段。
 ---
 
 # /change <type> <name> — 变更记录入口

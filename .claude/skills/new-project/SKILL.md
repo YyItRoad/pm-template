@@ -1,13 +1,13 @@
 ---
 name: new-project
-description: pm-template 唯一入口 skill。初始化 STATE.md(若缺失),首启时调 superpowers:brainstorming 把问题聊透,引导 L1 技术栈锁确认,串行调度 phase 0→4,每个 phase 末自动跑 DoD + critic + sign-off,逐 phase 锁。中途 Ctrl+C 可用 /new-project 续跑。
+description: 新建 / 续跑项目入口。初始化 STATE.md(若缺失),首启时调 superpowers:brainstorming 把问题聊透,引导 L1 技术栈锁确认,串行调度 phase 0→4,每个 phase 末自动跑 DoD + critic + sign-off,逐 phase 锁。中途 Ctrl+C 中断后再跑自动续跑(无 <topic> 模式)。维护期用 /change / /decision / /release,不用本 skill。
 ---
 
 # /new-project <topic> — 项目启动入口
 
 ## 用途
 
-pm-template 的**唯一**入口 skill。串行调度 5 个 phase,逐 phase 锁。
+项目的**唯一**入口 skill。串行调度 5 个 phase,逐 phase 锁。
 
 **不直接写 STATE.md**(各 phase skill 自己写)。
 

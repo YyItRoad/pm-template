@@ -1,6 +1,6 @@
 ---
 name: state
-description: 读取并渲染 pm-template 的 STATE.md,显示当前 5 phase 进度,支持 --audit 模式扫描 template_sha 过期。
+description: 读取并渲染 docs/process/STATE.md,显示当前 5 phase 进度,支持 --audit 模式扫描 template_sha 过期。
 ---
 
 # /state — 流程状态查看
@@ -92,10 +92,10 @@ Phase | 锁定时 SHA  | 当前 SHA   | 状态
 ## 输出格式
 
 ```
-=== pm-template 状态 ===
+=== 流程状态 ===
 
 STATE.md: /path/to/docs/process/STATE.md
-pm-template SHA: <当前 HEAD>(对比 STATE.md 记录的)
+template SHA: <当前 HEAD>(对比 STATE.md 记录的)
 
   Phase 0 立项      : [ ]            — 未开始
   Phase 1 需求★     : [x] by Alice 2026-06-09  — 已锁(SHA: abc1234)

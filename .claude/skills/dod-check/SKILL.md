@@ -1,6 +1,6 @@
 ---
 name: dod-check
-description: 单跑 pm-template 的 DoD 勾选,对指定 phase 产物逐条检查 Definition of Done,输出通过/缺失清单。
+description: 单跑 DoD 勾选,对指定 phase 产物(或 change/<type> 变更 spec)逐条检查 Definition of Done,输出通过/缺失清单。
 ---
 
 # /dod-check <phase> — 单跑 DoD 勾选

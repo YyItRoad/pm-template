@@ -1,6 +1,6 @@
 ---
 name: critic
-description: 单跑 pm-template 的 critic 模板,对指定 phase 产物做自审,产报告存档到 docs/process/critics/reports/。
+description: 单跑 critic 模板,对指定 phase 产物(或 change/<type> 变更 spec)做自审,产报告存档到 docs/process/critics/reports/。
 ---
 
 # /critic <phase> — 单跑 critic 自审

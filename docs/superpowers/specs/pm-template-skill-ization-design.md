@@ -71,7 +71,9 @@ Claude Code 会话
   /unlock <phase>       ← 解锁 [x] phase + cascade 下游(spec §3.4)
 ```
 
-### 2.2 10 Skill 职责矩阵
+### 2.2 13 Skill 职责矩阵
+
+> spec 最初标 10 skill(变更入口后扩为 11,P2 #14 修复加 decision / release → 13)。
 
 | # | Skill 文件 | 触发命令 | 职责 | 写 STATE.md |
 |---|---|---|---|---|
@@ -85,6 +87,9 @@ Claude Code 会话
 | 8 | `critic.md` | `/critic <phase>` | 单跑 critic 模板,产报告存档 | 不写 |
 | 9 | `dod-check.md` | `/dod-check <phase>` | 单跑 DoD 勾选,缺啥报啥 | 不写 |
 | 10 | `unlock.md` | `/unlock <phase>` | 解锁 [x] phase + cascade 下游(改产物的入口) | 写 [UNLOCKED] |
+| 11 | `change.md` | `/change <type> <name>` | 维护期变更入口(feature/bugfix/refactor/hotfix/doc) | 写变更日志段 |
+| 12 | `decision.md` | `/decision <title>` | ADR 入口(架构决策记录,贯穿全程) | 写决策日志段 |
+| 13 | `release.md` | `/release vX.Y.Z` | 聚合 [x] 变更 → 1 个 release + git tag | 不写(写 docs/releases.md) |
 
 ### 2.3 关键约束
 
@@ -344,6 +349,69 @@ def update_state(phase: int, new_status: str, **kwargs):
 
 ---
 
+### 4.6 第三层:ADR 入口(`/decision`,spec 早期遗漏,P2 #14 修复加)
+
+**为什么独立**:
+- decision ≠ change:决策是"为什么",change 是"做了什么"。一个 change 可能触发 N 个 decision。
+- decision 贯穿项目全程(不像 change 是一次性事件),放 5 phase 状态机会污染主流程。
+
+**状态机**(`docs/process/STATE.md` "决策日志" 段):
+
+```
+proposed ──→ accepted ──→ deprecated
+                ↓
+            superseded (被新 ADR 替代)
+```
+
+| 状态 | 谁能改 | 含义 |
+|---|---|---|
+| `proposed` | 起草人 | 起草中,未定 |
+| `accepted` | 起草人 / reviewer | 已被项目接受 |
+| `deprecated` | 任何人 | 弃用(不再用,但没替代品) |
+| `superseded` | 任何人 | 被 #NNNN 替代(必填关联号) |
+
+**`supersede` 流程**:
+- 自动创建新 ADR(状态:proposed)
+- 在旧 ADR 末尾追加:状态变更 `accepted → superseded by #NNNN (签字: <name> YYYY-MM-DD)`
+- 在新 ADR 元信息 "关联决策" 字段填:`supersedes #NNNN`
+
+**与 change / release 关系**:
+- decision 不进 STATE.md 主 5 phase 状态机(与 change 一样是独立第二层)
+- decision → release log:决策被 supersede 时,在 release log 加一行 ADR 变更说明
+- change → decision 反查:某变更被哪些 ADR 驱动(双向链接,见 TODO §3)
+
+### 4.7 第四层:Release 入口(`/release`,spec 早期遗漏,P2 #14 修复加)
+
+**为什么独立**:
+- release 是"变更的聚合视图",与变更个体不同
+- release log 是审计追溯的关键载体,必须独立
+
+**版本号规范**(`vX.Y.Z`):
+
+| 级别 | 格式 | 场景 | 例 |
+|---|---|---|---|
+| **Major** | v0 → v1 | 架构级 / 不向后兼容 | v1.0.0 → v2.0.0 |
+| **Minor** | v0.0 → v0.1 | 加新能力(feature 变更) | v1.0.0 → v1.1.0 |
+| **Patch** | v0.0.0 → v0.0.1 | 修 bug / 文档 / 小重构 | v1.0.0 → v1.0.1 |
+| **Suffix** | `-rc.1` / `-beta.2` | 预发布 | v1.0.0-rc.1 |
+
+**`/change → /release` 联动**:
+- `/change <type> <name>` 锁 [x] 后,提示用户"是否走 /release 聚合"
+- 单变更 → `/release vX.Y.Z --include #NNNN`
+- 多变更累计 → 定期(如每周)跑 `/release vX.Y.Z`(聚合所有 [x])
+
+**`docs/releases.md` 文件格式**:
+- 首部:模板说明 + BEGIN/END EXAMPLE 段(锁定不删)
+- 中间:真实 release 段(按时间倒序)
+- 末尾:留空(给未来追加)
+- `/release` 写入时**只在 BEGIN/END EXAMPLE 段下方追加**,不动模板说明
+
+**与 ADR 联动**:release 段 `**关联 ADR**:#NNNN` 填对应决策号。
+
+**自动化**(TODO §3):git tag 触发自动写 release log(GitHub Actions)。
+
+---
+
 ## 五、资产映射
 
 | Skill 需要的内容 | 来源 | 读写 |
@@ -492,6 +560,12 @@ pm-template/                           ← 现有结构不变
 | `ERR_OPTIONAL_SECTION_FILLED_BUT_BLANK` | 模板里 [可选] 段挂了标题但内容是占位符 | 提示"删标题 / 写内容"二选一 | 3 DoD 门(本地) |
 | `ERR_PHASE_1_INCOMPLETE` | phase 2/3/4 启动时 grep 01 缺 4 anchor | 提示 `/unlock 1` 回去补挖掘证据 | **5 硬 grep 门** |
 | `ERR_UPSTREAM_INCOMPLETE` | phase 3/4 启动时 grep 上游缺关键段 | 提示 `/unlock` 对应 phase 补 | **5 硬 grep 门** |
+| `ERR_CHANGE_TYPE_INVALID` | `/change <type>` type 不在白名单 | 提示看 `docs/process/TODO.md` 扩展 | 1 状态机门(变更) |
+| `ERR_CHANGE_REQUIRES_GREENFIELD` | `/change` 调用但主 5 phase 0 个 [x] | 提示先 `/new-project` | 1 状态机门(变更) |
+| `ERR_CHANGE_FILE_EXISTS` | 同号 NNNN-<type>-<name>.md 已存在 | 检查编号 | 1 状态机门(变更) |
+| `ERR_RELEASE_VERSION_INVALID` | `/release` 版本号非 vX.Y.Z 格式 | 报格式要求 | 1 状态机门(release) |
+| `ERR_RELEASE_DUPLICATE` | 同一版本号已存在 | 提示用 patch 号(0.0.1 → 0.0.2) | 1 状态机门(release) |
+| `ERR_RELEASE_NO_CANDIDATES` | `/release` 调用但 0 个 [x] 变更 | 提示"等 /change 锁完再来" | 1 状态机门(release) |
 
 **统一处理**: helper 抛异常时,skill 立即退出 + 展示 traceback 关键 3 行 + 错误码,便于用户排查。
 

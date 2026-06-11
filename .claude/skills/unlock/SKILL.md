@@ -1,6 +1,6 @@
 ---
 name: unlock
-description: 解锁一个已锁 [x] phase 以便修改产物。cascade 自动解锁下游 phase,提示需逐个重跑 critic + 签字。补 /state 缺的实际执行入口。
+description: 解锁一个已锁 [x] phase 以便修改产物。cascade 自动解锁下游 phase,提示需逐个重跑 critic + 签字。/state 只读不写,本 skill 是改产物的实际入口。
 ---
 
 # /unlock <phase> — 解锁已锁 phase

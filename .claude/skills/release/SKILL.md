@@ -23,14 +23,7 @@ description: 把当前所有 [x] 变更聚合为 1 个 release 版本,写 docs/r
 /release --dry v0.12.0               # 只预览,不写文件
 ```
 
-## 版本号规范
-
-| 级别 | 格式 | 场景 | 例 |
-|---|---|---|---|
-| **Major** | v0 → v1 | 架构级 / 不向后兼容 | v1.0.0 → v2.0.0 |
-| **Minor** | v0.0 → v0.1 | 加新能力(feature 变更) | v1.0.0 → v1.1.0 |
-| **Patch** | v0.0.0 → v0.0.1 | 修 bug / 文档 / 小重构 | v1.0.0 → v1.0.1 |
-| **Suffix** | `-rc.1` / `-beta.2` | 预发布 | v1.0.0-rc.1 |
+> 版本号 MAJOR/MINOR/PATCH/suffix 规范见 spec §4.7。
 
 ## 执行步骤
 
@@ -94,20 +87,18 @@ from update_state import find_state_file, parse_state
 
 **不自动打 tag**(打 tag 是外部动作,需用户明示)。--auto-tag 旗标可自动打(谨慎)。
 
-## /change → /release 联动
+### 5. 提示 git tag(可选)
 
-`/change <type> <name>` 锁 [x] 后,提示用户"是否走 /release 聚合"。
+```
+> 建议执行:
+>   git tag -a v0.12.0 -m "Release v0.12.0 — 5 changes"
+>   git push origin v0.12.0
+```
 
-- 单变更 → 直接 `/release vX.Y.Z --include #NNNN`
-- 多变更累计 → 定期(如每周)跑 `/release vX.Y.Z`(聚合所有 [x])
+**不自动打 tag**(打 tag 是外部动作,需用户明示)。--auto-tag 旗标可自动打(谨慎)。
 
-## 与 docs/releases.md 文件的兼容性
-
-- 文件首部是模板说明 + BEGIN/END EXAMPLE 段(锁定不删)
-- 中间是真实 release 段(按时间倒序)
-- 文件末尾留空(给未来追加)
-
-`/release` 写入时**只在 BEGIN/END EXAMPLE 段下方追加**,不动模板说明。
+> 版本号规范(MAJOR/MINOR/PATCH/suffix)、`/change → /release` 联动、
+> `docs/releases.md` 文件格式详见 spec §4.7。
 
 ## 错误处理
 
@@ -126,9 +117,3 @@ from update_state import find_state_file, parse_state
 - 不在 release 段写"已知 bug"列表(那是 issue tracker 的事)
 - 不混用 [DEPRECATED] 变更进新 release(标记为废弃的不算"包含"内容)
 - 不批量删除历史 release 段(审计追溯,必须留)
-
-## 跨切面
-
-- **ADR 联动**:release 段关联 ADR 时填 `**关联 ADR**:#NNNN`
-- **变更 → release 反查**:每个变更 spec 的 `§9 关联引用` 段可填对应 release 号
-- **自动化**(TODO §3):git tag 触发自动写 release log(GitHub Actions)

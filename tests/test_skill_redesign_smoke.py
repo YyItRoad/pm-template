@@ -804,3 +804,122 @@ def test_root_readme_mentions_decision_and_release_entry_points() -> None:
     assert "/decision" in text, "根 README 缺 /decision 入口"
     assert "/release" in text, "根 README 缺 /release 入口"
     assert "ADR" in text or "决策" in text, "根 README 缺 ADR 介绍"
+
+
+# ===== skill / doc 一致性原则(用户提出,P2 + )=====
+
+
+ALL_SKILL_NAMES: tuple[str, ...] = (
+    "new-project", "phase-0-charter", "phase-1-requirements", "phase-2-design",
+    "phase-3-detail", "phase-4-implement", "state", "critic", "dod-check",
+    "unlock", "change", "decision", "release",
+)
+
+
+def _read_skill(name: str) -> tuple[str, str, str]:
+    """读 skill 文件,返回 (frontmatter description 段, h1 标题, body 其余部分)。"""
+    text = (REPO_ROOT / ".claude" / "skills" / name / "SKILL.md").read_text(encoding="utf-8")
+    # frontmatter description 段
+    m = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
+    assert m, f"{name} 缺 frontmatter"
+    fm = m.group(1)
+    desc_m = re.search(r"description:\s*(.+)", fm)
+    description = desc_m.group(1).strip() if desc_m else ""
+    # h1 = 第一个 # 开头的行
+    body = text[m.end():]
+    h1_m = re.search(r"^# (.+)$", body, re.MULTILINE)
+    h1 = h1_m.group(1).strip() if h1_m else ""
+    return description, h1, body
+
+
+def test_skill_descriptions_do_not_mention_pm_template() -> None:
+    """13 个 skill 的 frontmatter description 必不含 'pm-template'。
+
+    原因:description 是 Claude Code 触发 skill 时显示给用户的关键字段。
+    pm-template 是**模板项目本身**,新项目用 Use this template 复制后
+    description 仍叫 'pm-template 的 X' 会让用户困惑(我项目又不是 pm-template)。
+    保留'pm-template'的事实性 body 引用(如 'git submodule add pm-template' /
+    'pm-template 升 v1.1' / 错误码 'ERR_*')不在此限。
+    """
+    leaked: list[str] = []
+    for name in ALL_SKILL_NAMES:
+        description, _, _ = _read_skill(name)
+        if "pm-template" in description:
+            leaked.append(f"{name}: description 含 'pm-template'")
+    assert leaked == [], (
+        "以下 skill 的 description 含 'pm-template'(应改为通用描述):\n"
+        + "\n".join(leaked)
+    )
+
+
+def test_skill_titles_do_not_mention_pm_template() -> None:
+    """13 个 skill 的 h1 标题必不含 'pm-template'(同 description 原则)。"""
+    leaked: list[str] = []
+    for name in ALL_SKILL_NAMES:
+        _, h1, _ = _read_skill(name)
+        if "pm-template" in h1:
+            leaked.append(f"{name}: h1 含 'pm-template': {h1}")
+    assert leaked == [], (
+        "以下 skill 的标题含 'pm-template'(应改为通用标题):\n"
+        + "\n".join(leaked)
+    )
+
+
+def test_skill_intros_do_not_self_describe_as_pm_template() -> None:
+    """13 个 skill 的'用途'段第一句不应 self-describe 为 'pm-template 的 X'。
+
+    之前 bug:new-project / state / critic / dod-check 的开头都写
+    'pm-template 的 X 入口/skill',新项目复制后这句话就错了。
+    修复后:写'项目的 X 入口' / '读 STATE.md' 等通用描述。
+    'pm-template' 在 body 里作为模板仓库名出现是 OK 的(描述事实)。
+    """
+    leaked: list[str] = []
+    for name in ALL_SKILL_NAMES:
+        _, _, body = _read_skill(name)
+        # 取前 5 行(通常用途段在开头)
+        first_5 = "\n".join(body.splitlines()[:8])
+        # 模式:pm-template 的 <noun> 入口/skill
+        if re.search(r"pm-template\s*的.{0,15}(入口|skill|资产|仓库|项目)", first_5):
+            leaked.append(f"{name}: 开头 self-describe 为 'pm-template 的 X'")
+    assert leaked == [], (
+        "以下 skill 开头 self-describe 为 'pm-template 的 X'(应改为通用):\n"
+        + "\n".join(leaked)
+    )
+
+
+def test_decision_skill_does_not_have_doc_only_sections() -> None:
+    """decision/SKILL.md 不应含 doc-only 段('## 与 X 的关系' / '## 跨切面')。
+
+    这些段是文档性的(解释关系/链 TODO),应放 spec,skill 只留 1 行引用。
+    """
+    text = (REPO_ROOT / ".claude/skills/decision/SKILL.md").read_text(encoding="utf-8")
+    for bad in ("## 与 change", "## 与 release", "## 跨切面"):
+        assert bad not in text, f"decision/SKILL.md 不应含 doc-only 段: {bad}"
+
+
+def test_release_skill_does_not_have_doc_only_sections() -> None:
+    """release/SKILL.md 不应含 doc-only 段(版本号规范表 / 联动 / 文件兼容性 / 跨切面)。"""
+    text = (REPO_ROOT / ".claude/skills/release/SKILL.md").read_text(encoding="utf-8")
+    for bad in (
+        "## 版本号规范",
+        "## /change → /release 联动",
+        "## 与 docs/releases.md 文件的兼容性",
+        "## 跨切面",
+    ):
+        assert bad not in text, f"release/SKILL.md 不应含 doc-only 段: {bad}"
+
+
+def test_spec_contains_decision_and_release_design() -> None:
+    """spec §4.6/§4.7 必含 decision / release 设计(防止 skill 引用悬空)。"""
+    spec = (REPO_ROOT / "docs/superpowers/specs/pm-template-skill-ization-design.md").read_text(encoding="utf-8")
+    # §4.6 decision 设计
+    assert "### 4.6" in spec, "spec 缺 §4.6"
+    assert "decision" in spec.lower(), "spec §4.6 缺 decision 设计"
+    # §4.7 release 设计
+    assert "### 4.7" in spec, "spec 缺 §4.7"
+    assert "release" in spec.lower(), "spec §4.7 缺 release 设计"
+    # §2.2 13 skill 表
+    assert "13 Skill" in spec or "13 skill" in spec, "spec §2.2 缺 13 skill 表"
+    # §十一 错误码加 release 错误
+    assert "ERR_RELEASE_VERSION_INVALID" in spec, "spec 缺 ERR_RELEASE_VERSION_INVALID"
+    assert "ERR_RELEASE_DUPLICATE" in spec, "spec 缺 ERR_RELEASE_DUPLICATE"

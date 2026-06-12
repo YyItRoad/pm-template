@@ -43,8 +43,6 @@ docs/process/
 | 3 详细设计 | `docs/03a_business_process.md` 等 3 文件 | `templates/03_detailed_design.md` | `dod/03_detailed_design.md` | `critics/03a/b/c_*.md` |
 | 4 实现+验证 | 代码 + tests | (无) | `dod/04_implementation.md` | `critics/04_implementation.md` |
 
-完整设计说明见: `docs/superpowers/specs/standard-process-template-design.md`
-
 ## 技术栈规范
 
 新项目**必须**引用 [`tech_stack.md`](tech_stack.md),在 `docs/00_charter.md` §2.5 签字 = 锁。
@@ -75,3 +73,42 @@ docs/process/
 2. **你本人 review** — 看报告,CRITICAL/HIGH 改完,再勾 DoD 末两条(critic + 签字)
 
 只有两层都过,phase 才能锁。
+
+---
+
+## 设计原则(Why pm-template 是这样)
+
+> 答 5 个最常被问的"为什么"。精简版,设计取舍的完整讨论在 git history。
+
+### 1. 为什么 5 phase?不 3 不 7
+
+- 立项(Why) → 需求(What) → 概设(How-逻辑) → 详设(How-物理) → 实现(Code)
+- 每 phase 一个状态,粗→细。phase 之间有"签字门"挡漂移
+- 3 phase 粗(质量难控),7 phase 细(状态机爆炸 — 5 phase × 5 状态 = 25 个状态已接近认知上限)
+
+### 2. 为什么 L1/L2/L3 锁级?不扁平
+
+- L1 🔒 锁死:每次新项目重选会浪费时间(语言 / 框架 / 库)
+- L2 🟡 推荐:大概率沿用,偏离要文档化理由(数据库 / ORM)
+- L3 ⬜ 自由:按需选(具体小库)
+- 偏离成本 ↑ 时锁级 ↑。锁得越死,越要 Phase 0 签字 + unlock 流程保护
+
+### 3. 为什么 4 层后端(API/Service/Model/Schema)?
+
+- 防两个 AI 最常踩的坑:"胖 API 层"(业务写在 route)和"漏 service"(API 直接查 DB)
+- 4 层 + 单一职责是**机械约束**,让 AI 不能自由发挥
+- 详见 [`tech_stack.md`](tech_stack.md) §5
+
+### 4. 为什么 13 skill?不"手写流程"
+
+- 文档是死的,LLM 不照着读 → 流程等于没流程
+- 13 skill 把"5 phase 流程 + 状态机 + DoD + critic"封装成 Claude Code 可识别的入口
+- 1 入口(new-project)+ 5 phase + 4 辅助(state/critic/dod-check/unlock)+ 4 维护期(change/decision/release/audit)= 14(注:14 是 v0.4.0 后)
+- 状态机 6 状态(`[ ]`/`[~]`/`[x]`/`[UNLOCKED]`/`[SKIP]`/`[x] LEGACY`)覆盖完整生命周期
+
+### 5. 为什么 5 类门(状态机 / 签字 / DoD / critic / 硬 grep)?
+
+- 单层检查(critic 主观打分)易被 LLM 绕开
+- 5 类门 = 5 个**独立**机制,任一被绕还有 4 个兜底
+- 硬 grep 尤其关键 — LLM 不能"凭记忆"骗过 `grep` 命令
+- 例:Phase 2 启动时硬 grep `01_requirements.md` 的 4 个 anchor(挖掘证据),缺一就 `ERR_PHASE_1_INCOMPLETE`

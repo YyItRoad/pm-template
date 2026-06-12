@@ -80,7 +80,7 @@ class ConcurrentWriteError(StateError):
 
 # ===== STATE.md 解析 / 序列化 =====
 
-STATE_PATH = Path("docs/process/STATE.md")
+STATE_PATH = Path("docs/STATE.md")
 PHASE_HEADERS = [f"## Phase {i}" for i in range(5)]
 
 # Phase bullet 模式: "- 状态: <status>"
@@ -89,18 +89,17 @@ BULLET_RE = re.compile(r"^- (.*?):\s*(.*)$")
 
 
 def find_state_file(start: Path = Path(".")) -> Path:
-    """从 start 向上找 docs/process/STATE.md,找不到抛 ERR_STATE_FILE_CORRUPT。"""
-    cur = start.resolve()
-    for _ in range(10):  # 最多向上 10 层
-        candidate = cur / "docs" / "process" / "STATE.md"
-        if candidate.exists():
-            return candidate
-        if cur.parent == cur:
-            break
-        cur = cur.parent
-    raise StateFileCorruptError(
-        f"未找到 docs/process/STATE.md(从 {start.resolve()} 向上搜 10 层)"
-    )
+    """找 target 项目的 runtime 状态文件 docs/STATE.md。
+
+    找不到抛 ERR_STATE_FILE_CORRUPT。target 项目首次跑 /new-project 时
+    会从模板 docs/process/STATE.md 生成 docs/STATE.md。
+    """
+    candidate = start.resolve() / "docs" / "STATE.md"
+    if not candidate.exists():
+        raise StateFileCorruptError(
+            f"未找到 {candidate}(target 项目还没跑 /new-project?先跑 /new-project 生成 STATE.md)"
+        )
+    return candidate
 
 
 def parse_state(state_path: Path) -> dict[int, dict[str, str]]:

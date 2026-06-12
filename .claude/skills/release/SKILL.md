@@ -29,7 +29,7 @@ description: 把当前所有 [x] 变更聚合为 1 个 release 版本,写 docs/r
 
 ### 1. 扫 STATE.md 变更日志
 
-读 `docs/process/STATE.md` "变更日志" 段,提取所有 `[x]` 状态 + `[DEPRECATED]` 状态(后者标废弃,不入新 release)。
+读 `docs/STATE.md` "变更日志" 段,提取所有 `[x]` 状态 + `[DEPRECATED]` 状态(后者标废弃,不入新 release)。
 
 ```bash
 python3 -c "
@@ -40,7 +40,7 @@ from update_state import find_state_file, parse_state
 "
 ```
 
-实际更简单:用 `grep -E '^\| [0-9]+ ' docs/process/STATE.md` 提取表格行。
+实际更简单:用 `grep -E '^\| [0-9]+ ' docs/STATE.md` 提取表格行。
 
 ### 2. 选变更
 

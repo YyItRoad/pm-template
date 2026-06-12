@@ -1,7 +1,7 @@
 """audit.py — 对已实现功能做 5 项机械审查,生成报告。
 
-唯一合法读 `docs/process/STATE.md` 之外的产物文档(01/03b/代码/tests)的入口,
-目标项目用 `/audit` 触发。报告写 `docs/process/audit/reports/audit_<DATE>.md`。
+唯一合法读 `docs/STATE.md` 之外的产物文档(01/03b/代码/tests)的入口,
+目标项目用 `/audit` 触发。报告写 `docs/audit/reports/audit_<DATE>.md`。
 
 5 项检查(全 grep/diff,无 LLM):
 1. AC 覆盖率:01_requirements.md 的 AC 编号 → 必在 tests/ e2e_*.sh 出现
@@ -414,7 +414,7 @@ def main() -> int:
         "--check", action="store_true", help="只跑不写报告(返回 exit code)",
     )
     parser.add_argument(
-        "--report-path", help="自定义报告路径(默认 docs/process/audit/reports/audit_<DATE>.md)",
+        "--report-path", help="自定义报告路径(默认 docs/audit/reports/audit_<DATE>.md)",
     )
     args = parser.parse_args()
 

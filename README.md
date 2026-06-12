@@ -59,7 +59,7 @@
 
 1. **新项目**: GitHub 顶部 → **"Use this template"** → 选 owner/repo → 创建
 2. **触发 `/new-project <topic>`**:
-   - 自动初始化 `docs/process/STATE.md`(若缺失)
+   - 自动初始化 `docs/STATE.md`(从 `docs/process/STATE.md` 模板生成,若缺失)
    - 首启时调 `superpowers:brainstorming` 把问题聊透
    - 引导 L1 技术栈锁确认(逐条展示,用户 y/n 接受)
    - 串行调度 phase 0→4,每 phase 末自动跑 DoD + critic + sign-off

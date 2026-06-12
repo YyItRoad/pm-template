@@ -32,7 +32,7 @@ description: 维护期变更入口(feature/bugfix/refactor/hotfix/doc 5 type)。
 
 ## 前置条件
 
-- 项目**已用 pm-template 跑过 5 phase**(`docs/process/STATE.md` 主 5 phase 含至少 1 个 `[x]`)
+- 项目**已用 pm-template 跑过 5 phase**(`docs/STATE.md` 主 5 phase 含至少 1 个 `[x]`)
 - 项目根有 `docs/changes/` 目录(无则自动建)
 
 **无 STATE.md / 5 phase 未跑的项目** → 报 `ERR_CHANGE_REQUIRES_GREENFIELD`,提示先 `/new-project`。
@@ -67,7 +67,7 @@ if not has_any_locked:
 "
 ```
 
-**c) 拉 `docs/process/STATE.md` 解析"变更日志"段**(若不存在,初始化为空)。
+**c) 拉 `docs/STATE.md` 解析"变更日志"段**(若不存在,初始化为空)。
 
 ### 2. 分配变更编号 + 建文件
 

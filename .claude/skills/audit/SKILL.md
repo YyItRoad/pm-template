@@ -1,6 +1,6 @@
 ---
 name: audit
-description: 对已实现功能做 5 项机械审查(AC 覆盖 / 范围蔓延 / 反向需求 / 接口一致 / 单测覆盖),出报告存 docs/process/audit/reports/。用于"代码已写完,需要系统化查一遍有没有坑"。不写 STATE.md(只读,产报告)。
+description: 对已实现功能做 5 项机械审查(AC 覆盖 / 范围蔓延 / 反向需求 / 接口一致 / 单测覆盖),出报告存 docs/audit/reports/。用于"代码已写完,需要系统化查一遍有没有坑"。不写 STATE.md(只读,产报告)。
 ---
 
 # /audit — 已实现功能审查
@@ -15,7 +15,7 @@ description: 对已实现功能做 5 项机械审查(AC 覆盖 / 范围蔓延 / 
 4. **接口一致性** — 03b path/method 写的与代码 `@router` 装饰器 100% 一致
 5. **单测覆盖** — 每个接口都有至少 1 个 test case
 
-**不写 STATE.md**。只产报告存 `docs/process/audit/reports/audit_<DATE>.md`。
+**不写 STATE.md**。只产报告存 `docs/audit/reports/audit_<DATE>.md`。
 
 ## 何时用
 
@@ -82,7 +82,7 @@ python3 .claude/skills/_lib/audit.py
 
 ### 3. 写报告
 
-**路径**:`docs/process/audit/reports/audit_<YYYY-MM-DD>.md`
+**路径**:`docs/audit/reports/audit_<YYYY-MM-DD>.md`
 
 报告格式:
 ```markdown
@@ -122,7 +122,7 @@ python3 .claude/skills/_lib/audit.py
 
 ```
 > /audit 完成,overall: CRITICAL
-> 报告: docs/process/audit/reports/audit_2026-06-12.md
+> 报告: docs/audit/reports/audit_2026-06-12.md
 >
 > CRITICAL 项:1(AC 覆盖率 — 3 个 AC 缺 e2e)
 > HIGH 项:1(接口一致性 — 2 个 03b 接口没代码实现)

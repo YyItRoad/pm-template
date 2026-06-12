@@ -22,7 +22,7 @@
 | 11 | `change.md` | `/change <type> <name>` | 变更入口(feature/bugfix/refactor/hotfix/doc) | 写变更日志段 |
 | 12 | `decision.md` | `/decision <title>` | ADR 入口(架构决策记录,贯穿全程) | 写决策日志段 |
 | 13 | `release.md` | `/release vX.Y.Z` | 聚合 [x] 变更 → 1 个 release + tag | 不写(写 docs/releases.md) |
-| 14 | `audit.md` | `/audit` | 已实现功能审查(5 项机械检查) | 不写(写 docs/process/audit/reports/) |
+| 14 | `audit.md` | `/audit` | 已实现功能审查(5 项机械检查) | 不写(写 docs/audit/reports/) |
 
 > spec §2.1 原标"10 Skill",change 是 Batch A 加,decision / release 是 P2 #14 修复加,共 13;v0.4.0 加 audit → 14。
 

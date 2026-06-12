@@ -5,12 +5,11 @@
   "ship": {
     "_comment": "Use this template 后,这些路径**保留**(目标项目用)。",
     ".claude/skills/": "14 个 Claude Code skill(new-project / phase-0~4 / state / critic / dod-check / unlock / change / decision / release / audit)+ `_lib/` 共享 helper 脚本(update_state.py / audit.py / migrate_legacy_state.py)。",
-    "docs/process/STATE.md": "主 5 phase 状态机(空模板,Use this template 后第一个跑 /new-project 初始化)。",
+    "docs/process/STATE.md": "STATE.md **格式模板**(只读,定义 5 phase + 变更日志 + 决策日志 段结构)。target 项目的 runtime 状态文件在 `docs/STATE.md`,由 `/new-project` 首启时**生成**(读此模板,写到 docs/STATE.md),后续 `update_state.py` 原地读写。",
     "docs/process/tech_stack.md": "标准技术栈规范 L1/L2/L3 锁级。",
     "docs/process/templates/": "5 phase + 5 change + decision + release 模板(目标项目按模板填空),含 release.md / decision.md 子模板。",
     "docs/process/critics/": "5 phase + 5 change + decision critic 模板。",
     "docs/process/dod/": "5 phase + 5 change + decision DoD(全局 D<N>-NN / C<X>-NN / DCR-NN 编号)。",
-    "docs/process/audit/": "审计报告目录(目标项目 /audit skill 用,.gitkeep 占位;跑 /audit 后 reports/ 子目录自动生成 *.md 报告,**这些报告是目标项目自己的,不是 pm-template 的**)。",
     "README.md": "目标项目可改名为自己的 README(pm-template 自身 README 是示例)。",
     "LICENSE": "MIT,目标项目保留。"
   },

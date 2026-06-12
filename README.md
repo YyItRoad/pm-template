@@ -25,6 +25,15 @@
 | 设计 spec | [`docs/superpowers/specs/standard-process-template-design.md`](docs/superpowers/specs/standard-process-template-design.md) / [`standard-tech-stack-design.md`](docs/superpowers/specs/standard-tech-stack-design.md) / [`pm-template-skill-ization-design.md`](docs/superpowers/specs/pm-template-skill-ization-design.md) |
 | 13 skills 列表与职责 | [`.claude/skills/README.md`](.claude/skills/README.md) |
 
+## 作为 GitHub Template 使用
+
+"Use this template" 创建新项目后,用 [`MANIFEST.json`](MANIFEST.json) 区分:
+
+- **`ship` 段** — 目标项目要保留(14 skill + 模板 + critic + DoD + STATE + tech_stack)
+- **`skip` 段** — pm-template 自己的 meta(可删,`tests/` / `docs/process/CHANGELOG.md` / `TODO.md` / `TESTING_BOUNDARY.md` / `docs/superpowers/`)
+
+对齐 npm `package.json` `files` 字段 / Python `MANIFEST.in` 行业约定。详见 [MANIFEST.json](MANIFEST.json)。
+
 ---
 
 ## 14 个 Skill(分 4 层)

@@ -1,0 +1,32 @@
+{
+  "version": "0.4.0",
+  "schema": "https://json-schema.org/draft-07/schema#",
+  "description": "pm-template 交付清单 — 区分目标项目需要的资产 vs pm-template 自己的 meta。对齐 npm package.json 'files' 字段 / Python MANIFEST.in 行业约定。",
+  "ship": {
+    "_comment": "Use this template 后,这些路径**保留**(目标项目用)。",
+    ".claude/skills/": "14 个 Claude Code skill(new-project / phase-0~4 / state / critic / dod-check / unlock / change / decision / release / audit)。",
+    ".claude/scripts/": "update_state.py(STATE 写 helper)+ audit.py(已实现功能审查脚本)。",
+    "docs/process/STATE.md": "主 5 phase 状态机(空模板,Use this template 后第一个跑 /new-project 初始化)。",
+    "docs/process/tech_stack.md": "标准技术栈规范 L1/L2/L3 锁级。",
+    "docs/process/templates/": "5 phase + 5 change + decision + release 模板(目标项目按模板填空),含 release.md / decision.md 子模板。",
+    "docs/process/critics/": "5 phase + 5 change + decision critic 模板。",
+    "docs/process/dod/": "5 phase + 5 change + decision DoD(全局 D<N>-NN / C<X>-NN / DCR-NN 编号)。",
+    "docs/process/audit/": "审计报告目录(目标项目 /audit skill 用,.gitkeep 占位)。",
+    "README.md": "目标项目可改名为自己的 README(pm-template 自身 README 是示例)。",
+    "LICENSE": "MIT,目标项目保留。"
+  },
+  "skip": {
+    "_comment": "Use this template 后,这些路径**可删**(pm-template 自己的 meta)。",
+    "docs/superpowers/": "pm-template 自己的设计 spec + plan(pm-template 演化用,目标项目用不到,删后该目录可空,或目标项目用此目录放自己的 spec)。",
+    "tests/": "pm-template 自己的 pytest(测 pm-template 自己的代码,目标项目不需要)。",
+    "docs/process/CHANGELOG.md": "pm-template 自己的迭代历史(v0.1/0.2/0.3/0.4)。",
+    "docs/process/TODO.md": "pm-template 自己的未来工作。",
+    "docs/process/TESTING_BOUNDARY.md": "pm-template 自己的测试边界文档。",
+    "docs/process/audit/reports/": "pm-template 自己的 audit 报告(空占位已 ship,reports 子目录下的 *.md 报告是 pm-template 跑出来的)。",
+    "MANIFEST.json": "本清单本身(可删,但建议保留 — 未来 /adopt skill 读它自动处理 ship/skip)。"
+  },
+  "usage": {
+    "human": "克隆本仓库后,看 ship/skip 两段决定保留什么/删什么。",
+    "tooling": "未来 /adopt skill 读本文件,自动 copy ship 列表 + rm skip 列表,实现一键接入现有项目。"
+  }
+}

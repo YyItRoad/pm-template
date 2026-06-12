@@ -1092,6 +1092,72 @@ def test_spec_contains_decision_and_release_design() -> None:
 # ===== 根 README 与最新状态同步 =====
 
 
+def test_manifest_file_exists_and_is_valid_json() -> None:
+    """MANIFEST.json 必存在 + 是合法 JSON + 含 ship/skip/version 3 段。"""
+    import json
+    p = REPO_ROOT / "MANIFEST.json"
+    assert p.exists(), "MANIFEST.json 缺"
+    data = json.loads(p.read_text(encoding="utf-8"))
+    assert "version" in data, "MANIFEST.json 缺 version"
+    assert "ship" in data, "MANIFEST.json 缺 ship 段"
+    assert "skip" in data, "MANIFEST.json 缺 skip 段"
+    assert len(data["ship"]) > 0, "ship 段必 ≥1 项"
+    assert len(data["skip"]) > 0, "skip 段必 ≥1 项"
+
+
+def test_manifest_ship_paths_actually_exist() -> None:
+    """MANIFEST.json ship 段列的路径必真存在(防 manifest 漂移)。"""
+    import json
+    data = json.loads((REPO_ROOT / "MANIFEST.json").read_text(encoding="utf-8"))
+    for path_str in data["ship"]:
+        if path_str.startswith("_"):
+            continue  # _comment 之类
+        p = REPO_ROOT / path_str
+        assert p.exists(), f"MANIFEST ship 段列了不存在的路径: {path_str}"
+
+
+def test_manifest_no_overlap_between_ship_and_skip() -> None:
+    """MANIFEST.json ship 与 skip 必无重叠(同一路径不能两段都在)。"""
+    import json
+    data = json.loads((REPO_ROOT / "MANIFEST.json").read_text(encoding="utf-8"))
+    ship = {k for k in data["ship"] if not k.startswith("_")}
+    skip = {k for k in data["skip"] if not k.startswith("_")}
+    overlap = ship & skip
+    assert not overlap, f"ship 与 skip 重叠: {overlap}"
+
+
+def test_manifest_skip_classifies_known_internal_files() -> None:
+    """MANIFEST.json skip 段必包含已知 pm-template 内部文件(防漏归类)。"""
+    import json
+    data = json.loads((REPO_ROOT / "MANIFEST.json").read_text(encoding="utf-8"))
+    skip = {k for k in data["skip"] if not k.startswith("_")}
+    # 已知内部文件必在 skip
+    for required_skip in (
+        "tests/",                     # pm-template 自己的测试
+        "docs/process/CHANGELOG.md",  # pm-template 自己的迭代历史
+        "docs/process/TODO.md",       # pm-template 自己的 TODO
+        "docs/process/TESTING_BOUNDARY.md",  # pm-template 自己的测试边界
+    ):
+        assert required_skip in skip, f"MANIFEST skip 段缺已知内部文件: {required_skip}"
+
+
+def test_manifest_ship_classifies_known_deliverable_files() -> None:
+    """MANIFEST.json ship 段必包含已知目标项目需要的关键资产。"""
+    import json
+    data = json.loads((REPO_ROOT / "MANIFEST.json").read_text(encoding="utf-8"))
+    ship = {k for k in data["ship"] if not k.startswith("_")}
+    for required_ship in (
+        ".claude/skills/",          # 14 skill
+        ".claude/scripts/",         # update_state + audit
+        "docs/process/STATE.md",    # 状态机模板
+        "docs/process/tech_stack.md",  # 栈规范
+        "docs/process/templates/", # 5 phase + change 模板
+        "docs/process/critics/",   # 5 phase + change critic
+        "docs/process/dod/",       # 5 phase + change DoD
+    ):
+        assert required_ship in ship, f"MANIFEST ship 段缺已知交付物: {required_ship}"
+
+
 def test_root_readme_mentions_13_skills() -> None:
     """根 README 必提 13 skills(防漏挂导致用户找不到)。"""
     text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")

@@ -55,7 +55,7 @@ esac
 ```bash
 python3 -c "
 import sys
-sys.path.insert(0, '.claude/scripts')
+sys.path.insert(0, '.claude/skills/_lib')
 from update_state import find_state_file, parse_state, get_current_status
 st = parse_state(find_state_file())
 locked = [get_current_status(st[i]) for i in range(5)]

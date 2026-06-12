@@ -82,7 +82,7 @@ Args: <topic>(原始用户输入)+ <project_root_path>(<cwd>)
 ```bash
 python3 -c "
 import sys
-sys.path.insert(0, '.claude/scripts')
+sys.path.insert(0, '.claude/skills/_lib')
 from update_state import find_state_file, parse_state, get_current_status
 st = parse_state(find_state_file())
 for i in range(5):

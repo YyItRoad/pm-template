@@ -22,7 +22,7 @@ description: 读取并渲染 docs/STATE.md,显示当前 5 phase 进度,支持 --
 
 ### 1. 找 STATE.md
 
-用 `python3 -c "import sys; sys.path.insert(0, '.claude/scripts'); from update_state import find_state_file; print(find_state_file())"` 拿到绝对路径。
+用 `python3 -c "import sys; sys.path.insert(0, '.claude/skills/_lib'); from update_state import find_state_file; print(find_state_file())"` 拿到绝对路径。
 
 如果 `find_state_file` 抛 `StateFileCorruptError`(文件不存在):
 - 输出:`✗ 未找到 docs/STATE.md`

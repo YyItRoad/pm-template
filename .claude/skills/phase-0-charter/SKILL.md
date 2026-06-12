@@ -27,7 +27,7 @@ description: 先做挖掘回合(10 利益相关方/10 约束/5 非目标 穷举,
 
 **a) 找 STATE.md**:
 ```bash
-python3 -c "import sys; sys.path.insert(0, '.claude/scripts'); from update_state import find_state_file, parse_state, get_current_status; sp = find_state_file(); st = parse_state(sp); print(f'Phase 0: {get_current_status(st[0])}')"
+python3 -c "import sys; sys.path.insert(0, '.claude/skills/_lib'); from update_state import find_state_file, parse_state, get_current_status; sp = find_state_file(); st = parse_state(sp); print(f'Phase 0: {get_current_status(st[0])}')"
 ```
 
 - 抛 `StateFileCorruptError` → 报"STATE.md 缺失或损坏,先跑 `/new-project <topic>` 初始化"

@@ -28,7 +28,7 @@ description: 解锁一个已锁 [x] phase 以便修改产物。cascade 自动解
 ```bash
 python3 -c "
 import sys
-sys.path.insert(0, '.claude/scripts')
+sys.path.insert(0, '.claude/skills/_lib')
 from update_state import find_state_file, parse_state, get_current_status
 sp = find_state_file()
 st = parse_state(sp)

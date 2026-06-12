@@ -34,7 +34,7 @@ description: 把当前所有 [x] 变更聚合为 1 个 release 版本,写 docs/r
 ```bash
 python3 -c "
 import sys
-sys.path.insert(0, '.claude/scripts')
+sys.path.insert(0, '.claude/skills/_lib')
 from update_state import find_state_file, parse_state
 # 注:变更日志是 markdown 表格,不是状态机 — 用 grep 提取更合适
 "

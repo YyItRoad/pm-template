@@ -9,7 +9,6 @@
 docs/process/
 ├── README.md            ← 你正在看
 ├── STATE.md             ← STATE.md **格式模板**(只读,定义 5 phase + 变更日志 + 决策日志 段结构);target 项目的 runtime 状态在 `docs/STATE.md`,由 `/new-project` 生成
-├── CHANGELOG.md         ← 流程模板迭代历史
 ├── tech_stack.md        ← 标准技术栈规范
 ├── templates/           ← artifact 模板(给 AI 填空,不自由发挥)
 │   ├── 00_charter.md

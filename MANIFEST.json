@@ -17,7 +17,7 @@
     "_comment": "Use this template 后,这些路径**可删**(pm-template 自己的 meta)。",
     "docs/superpowers/": "pm-template 自己的设计 spec + plan(pm-template 演化用,目标项目用不到,v0.4.0 起该目录在 pm-template 仓库内为空)。",
     "tests/": "pm-template 自己的 pytest(测 pm-template 自己的代码,目标项目不需要)。",
-    "docs/process/CHANGELOG.md": "pm-template 自己的迭代历史(v0.1/0.2/0.3/0.4)。",
+    "docs/process/CHANGELOG.md": "(已删除;迭代历史改在 git commit message 里)",
     "docs/process/TODO.md": "pm-template 自己的未来工作。",
     "MANIFEST.json": "本清单本身(可删,但建议保留 — 未来 /adopt skill 读它自动处理 ship/skip)。"
   },

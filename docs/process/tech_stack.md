@@ -1,7 +1,7 @@
 # 标准技术栈规范
 
 > **版本: v1.0**(初版)
-> **配套**: [README.md](README.md) · [CHANGELOG.md](CHANGELOG.md)
+> **配套**: [README.md](README.md)(CHANGELOG 已删,迭代历史改在 git commit message)
 > **作用**: 把"web 应用 + 后台管理 SPA + 关系数据库"型项目的高频技术选型沉淀为可复用规范,新项目启动直接套用,不再每次重新选
 
 ---
@@ -271,7 +271,7 @@ Phase 2 / 3 / 4 发现需偏航
 
 - `tech_stack.md` 顶部标 `**版本: v1.0**`(当前)
 - 每次升级大改 → version bump(v1.0 → v2.0)
-- `docs/process/CHANGELOG.md` 记"v2 改了什么 + 为什么 + 旧项目如何过渡"
+- 改"v2 改了什么 + 为什么 + 旧项目如何过渡" 写 commit message + git history
 - **升级不影响已锁定的项目** —— 旧项目按当时的 v0.1 / v1.0 锁,新 v2 发布后仍生效;只有新项目用最新 v 锁
 
 ---

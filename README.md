@@ -30,7 +30,7 @@
 "Use this template" 创建新项目后,用 [`MANIFEST.json`](MANIFEST.json) 区分:
 
 - **`ship` 段** — 目标项目要保留(14 skill + 模板 + critic + DoD + STATE + tech_stack)
-- **`skip` 段** — pm-template 自己的 meta(可删,`tests/` / `docs/process/CHANGELOG.md` / `TODO.md` / `TESTING_BOUNDARY.md` / `docs/superpowers/`)
+- **`skip` 段** — pm-template 自己的 meta(可删,`tests/` / `TODO.md` / `TESTING_BOUNDARY.md` / `docs/superpowers/`;`docs/process/CHANGELOG.md` 已删)
 
 对齐 npm `package.json` `files` 字段 / Python `MANIFEST.in` 行业约定。详见 [MANIFEST.json](MANIFEST.json)。
 

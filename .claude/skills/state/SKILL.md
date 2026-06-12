@@ -32,7 +32,7 @@ description: 读取并渲染 docs/process/STATE.md,显示当前 5 phase 进度,�
 ### 2. 解析 + 渲染
 
 ```bash
-python3 .claude/scripts/update_state.py --check
+python3 .claude/skills/_lib/update_state.py --check
 ```
 
 它会输出:

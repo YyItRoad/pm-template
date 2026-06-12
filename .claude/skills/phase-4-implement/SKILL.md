@@ -88,7 +88,7 @@ fi
 ### 2. 标记 in-progress
 
 ```bash
-python3 .claude/scripts/update_state.py --phase 4 --status "[~]"
+python3 .claude/skills/_lib/update_state.py --phase 4 --status "[~]"
 ```
 
 ### 3. 拉设计资产(spec §13 骨架)
@@ -202,7 +202,7 @@ done < /tmp/ac_list.txt
 ### 9. 锁
 
 ```bash
-python3 .claude/scripts/update_state.py \
+python3 .claude/skills/_lib/update_state.py \
   --phase 4 \
   --status "[x]" \
   --signed-by "<name>" \

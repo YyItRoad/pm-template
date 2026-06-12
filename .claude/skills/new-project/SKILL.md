@@ -46,7 +46,7 @@ except StateFileCorruptError:
 - 用 Read tool 读全文 → Write tool 写到目标
 - 写完提示:"已初始化 STATE.md,接下来:"
 
-`EXISTS` → 解析并显示当前状态(用 `python3 .claude/scripts/update_state.py --check`)。
+`EXISTS` → 解析并显示当前状态(用 `python3 .claude/skills/_lib/update_state.py --check`)。
 
 ### 1.5. 调 superpowers:brainstorming(改动 3,★首启时)
 

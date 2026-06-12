@@ -91,7 +91,7 @@ for i in range(5):
 ### 5. 调 update_state
 
 ```bash
-python3 .claude/scripts/update_state.py \
+python3 .claude/skills/_lib/update_state.py \
   --phase 0 \
   --status "[UNLOCKED]" \
   --lock-reason "<reason>"

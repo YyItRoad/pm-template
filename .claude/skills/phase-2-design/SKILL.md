@@ -60,7 +60,7 @@ fi
 ### 2. 标记 in-progress(可选)
 
 ```bash
-python3 .claude/scripts/update_state.py --phase 2 --status "[~]"
+python3 .claude/skills/_lib/update_state.py --phase 2 --status "[~]"
 ```
 
 ### 3. 拉模板 + 引导填空
@@ -112,7 +112,7 @@ python3 .claude/scripts/update_state.py --phase 2 --status "[~]"
 ### 8. 锁
 
 ```bash
-python3 .claude/scripts/update_state.py \
+python3 .claude/skills/_lib/update_state.py \
   --phase 2 \
   --status "[x]" \
   --signed-by "<name>" \

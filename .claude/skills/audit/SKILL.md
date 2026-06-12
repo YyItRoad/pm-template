@@ -65,7 +65,7 @@ docs/03b_api_design.md           # 接口清单
 
 ### 2. 跑 5 项检查(全 grep/diff,无 LLM)
 
-调用 `.claude/scripts/audit.py`:
+调用 `.claude/skills/_lib/audit.py`:
 
 ```python
 from audit import run_audit, render_report
@@ -77,7 +77,7 @@ report = render_report(audit)
 
 实际 CLI:
 ```bash
-python3 .claude/scripts/audit.py
+python3 .claude/skills/_lib/audit.py
 ```
 
 ### 3. 写报告
@@ -166,7 +166,7 @@ python3 .claude/scripts/audit.py
 ```yaml
 # .github/workflows/audit.yml
 - name: Audit
-  run: python3 .claude/scripts/audit.py --check
+  run: python3 .claude/skills/_lib/audit.py --check
   # exit 0 = PASS,exit 1 = 有 CRITICAL/HIGH
 ```
 

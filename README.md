@@ -1,7 +1,7 @@
 # pm-template
 
-> **Standard 5-phase project management process template + tech stack spec + 13 skills**
-> 标准 5 阶段项目管理流程模板 + 技术栈规范 + 13 个 Claude Code skill
+> **Standard 5-phase project management process template + tech stack spec + 14 skills**
+> 标准 5 阶段项目管理流程模板 + 技术栈规范 + 14 个 Claude Code skill
 
 ## 这是什么 / What is this
 
@@ -9,7 +9,7 @@
 
 - **5 phase 流程** — 立项 / 需求 / 概要设计 / 详细设计 / 实现,每 phase 三件套(模板 + DoD + critic)
 - **标准技术栈** — L1/L2/L3 锁级,Phase 0 签字 = 锁
-- **13 个 Claude Code skill** — 把流程 + tech_stack 资产从"死的文档"升级为"活的流程引擎"
+- **14 个 Claude Code skill** — 把流程 + tech_stack 资产从"死的文档"升级为"活的流程引擎"
 - **双层验证** — AI critic 自审 + 用户签字
 
 **不是**给单个项目用的脚手架。**是**给所有同类型项目共享的"流程 + 选型 + skill"标准。
@@ -27,15 +27,15 @@
 
 ---
 
-## 13 个 Skill(分 4 层)
+## 14 个 Skill(分 4 层)
 
 | 层 | 数量 | 职责 |
 |---|---|---|
 | **入口** | 1 | `new-project` — 串行调度 phase 0→4,首启时调 brainstorming |
 | **5 phase** | 5 | `phase-0-charter` / `phase-1-requirements` / `phase-2-design` / `phase-3-detail` / `phase-4-implement` |
 | **辅助** | 4 | `state` / `critic` / `dod-check` / `unlock` |
-| **维护期 + 跨切面** | 3 | `change` / `decision` / `release` |
-| **合计** | **13** | 详见 [`.claude/skills/README.md`](.claude/skills/README.md) |
+| **维护期 + 跨切面** | 4 | `change` / `decision` / `release` / **`audit`**(已实现功能审查) |
+| **合计** | **14** | 详见 [`.claude/skills/README.md`](.claude/skills/README.md) |
 
 > **文档与 skill 职责分工**(原则):
 > - **skill**(给 Claude Code 执行)只说"做什么 + 错误处理 + 不要做",1 行引用 spec
@@ -67,7 +67,7 @@
 
 ### C. 维护期:变更 / 决策 / 发布
 
-5 phase 锁完后进入维护期。3 个独立入口:
+5 phase 锁完后进入维护期。4 个独立入口:
 
 ```bash
 # 1. /change — 加能力 / 修 bug / 重构(5 type,见下方)
@@ -83,6 +83,10 @@
 
 # 3. /release — 把 [x] 变更聚合为 1 个版本
 /release v0.12.0                  # 聚合所有 [x] 变更 → 写 docs/releases.md
+
+# 4. /audit — 对已实现功能做系统化审查(接手 / release 前)
+/audit                            # 5 项机械检查(AC 覆盖 / 范围蔓延 / 反向需求 / 接口一致 / 单测)
+/audit --check                    # CI gate 模式(只返 exit code 不写报告)
 ```
 
 变更日志状态机:`[ ]` → `[~]` → `[x]`(独立于 5 phase 状态机)。

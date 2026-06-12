@@ -809,6 +809,110 @@ def test_root_readme_mentions_decision_and_release_entry_points() -> None:
 # ===== 二轮审计守护(critic/dod-check 引用 + spec 残留)=====
 
 
+def test_audit_skill_exists_with_correct_frontmatter() -> None:
+    """/audit skill 文件必存在且 frontmatter 合规(Claude Code 识别)。"""
+    f = REPO_ROOT / ".claude" / "skills" / "audit" / "SKILL.md"
+    assert f.exists(), "audit skill 缺"
+    text = f.read_text(encoding="utf-8")
+    assert text.startswith("---\n"), "audit SKILL.md 缺 frontmatter"
+    assert "name: audit" in text, "audit frontmatter 缺 name: audit"
+    assert "description:" in text, "audit frontmatter 缺 description"
+
+
+def test_audit_script_exists_and_imports() -> None:
+    """audit.py 必存在 + 可独立运行(5 项检查函数定义完整)。"""
+    f = REPO_ROOT / ".claude" / "scripts" / "audit.py"
+    assert f.exists(), ".claude/scripts/audit.py 缺"
+    text = f.read_text(encoding="utf-8")
+    # 5 项检查函数必定义
+    for fn in (
+        "def check_ac_coverage",
+        "def check_scope_creep",
+        "def check_reverse_requirements",
+        "def check_interface_consistency",
+        "def check_test_coverage",
+    ):
+        assert fn in text, f"audit.py 缺检查函数: {fn}"
+    # CLI 入口必支持 --check / --report-path
+    assert "argparse" in text, "audit.py 缺 argparse"
+    assert '"--check"' in text or "'--check'" in text, "audit.py 缺 --check 选项"
+
+
+def test_audit_report_directory_exists() -> None:
+    """docs/process/audit/ 报告目录必存在(.gitkeep 占位)。"""
+    audit_dir = REPO_ROOT / "docs" / "process" / "audit"
+    assert audit_dir.exists(), "docs/process/audit/ 目录缺"
+    assert (audit_dir / ".gitkeep").exists(), "docs/process/audit/.gitkeep 缺"
+    reports_dir = audit_dir / "reports"
+    assert reports_dir.exists(), "docs/process/audit/reports/ 目录缺"
+    assert (reports_dir / ".gitkeep").exists(), "docs/process/audit/reports/.gitkeep 缺"
+
+
+def test_audit_skill_does_not_have_doc_only_sections() -> None:
+    """/audit SKILL.md 不含 doc-only 段(版本号规范/与 change 关系/跨切面 等放 spec)。"""
+    text = (REPO_ROOT / ".claude" / "skills" / "audit" / "SKILL.md").read_text(encoding="utf-8")
+    # 不应含 doc-only 段标题
+    for bad in ("## 历史", "## 背景", "## 跨切面"):
+        assert bad not in text, f"audit/SKILL.md 仍有 doc-only 段: {bad}"
+
+
+def test_skills_readme_lists_14_skills_after_audit_added() -> None:
+    """skills/README.md 必列全 14 个 skill(加 audit)。"""
+    text = (REPO_ROOT / ".claude" / "skills" / "README.md").read_text(encoding="utf-8")
+    for name in (
+        "new-project", "phase-0-charter", "phase-1-requirements", "phase-2-design",
+        "phase-3-detail", "phase-4-implement", "state", "critic", "dod-check",
+        "unlock", "change", "decision", "release", "audit",
+    ):
+        assert name in text, f"skills/README.md 缺 skill: {name}"
+
+
+def test_root_readme_mentions_audit() -> None:
+    """根 README.md 必提 /audit 入口。"""
+    text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert "/audit" in text, "根 README 缺 /audit 入口"
+    assert "已实现" in text or "审查" in text, "根 README 缺 audit 简介"
+
+
+def test_audit_script_cli_help_works() -> None:
+    """audit.py --help 必能正常输出(无语法错)。"""
+    import subprocess
+    import sys
+    result = subprocess.run(
+        [sys.executable, str(REPO_ROOT / ".claude" / "scripts" / "audit.py"), "--help"],
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    assert result.returncode == 0, f"audit.py --help 失败: {result.stderr}"
+    # help 必含 5 个旗标
+    for flag in ("--ac-only", "--scope-creep", "--reverse-req", "--interface", "--test-coverage"):
+        assert flag in result.stdout, f"audit.py --help 缺旗标: {flag}"
+
+
+def test_audit_script_check_mode_returns_error_when_artifacts_missing() -> None:
+    """audit.py --check 在 01/03b 缺失时必返非 0 退出。"""
+    import subprocess
+    import sys
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        # tmp 是空目录,必缺 01/03b
+        result = subprocess.run(
+            [sys.executable, str(REPO_ROOT / ".claude" / "scripts" / "audit.py"), "--check"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            cwd=tmp,
+        )
+        assert result.returncode != 0, (
+            f"audit.py 在无 01/03b 时应返非 0,实际: {result.returncode}\n"
+            f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        )
+
+
+# ===== 二轮审计守护(critic/dod-check 引用 + spec 残留)=====
+
+
 def test_skill_examples_use_new_dod_numbering() -> None:
     """critic / dod-check 的示例必用新 DoD 编号(D0-NN),不用旧 'DoD-01' ~ 'DoD-08'。
 

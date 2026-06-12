@@ -1,7 +1,7 @@
 # pm-template Skills
 
 > 14 个 Claude Code skill,把 pm-template 的 5-phase 流程 + tech_stack 资产从"死的文档"升级为"活的流程引擎"。
-> 设计 spec: [`docs/superpowers/specs/pm-template-skill-ization-design.md`](../../docs/superpowers/specs/pm-template-skill-ization-design.md)
+> 设计取舍的完整讨论见 git history(pm-template v0.4.0 起 specs/ 不再随仓库 ship)。
 
 ---
 
@@ -50,7 +50,7 @@
 
 ## 关键约束(所有 skill 遵守)
 
-- **写 STATE.md 必须走唯一 helper `update_state()`**(9 skill 共用,见 `.claude/scripts/update_state.py`)。
+- **写 STATE.md 必须走唯一 helper `update_state()`**(9 skill 共用,见 `.claude/skills/_lib/update_state.py`)。
 - **只读** `docs/process/templates/` `dod/` `critics/` `tech_stack.md` 资产,不修改模板本身。
 - **每个 phase 锁前必须 sign-off**:用户明示 `y/n/c`,skill 不替用户锁(详 spec §3.2 / §12)。
 - **启动时做版本对齐检查**:`/state` + 每 phase skill 启动时,对比 `STATE.md` 记录的 `template_sha` vs pm-template git SHA,不一致就 warn(详 spec §6.3)。
@@ -66,7 +66,7 @@
 - `ERR_PHASE_LOCKED_BY_UPSTREAM` — 上游 [UNLOCKED],下游不能直接动
 - `ERR_CRITIC_HAS_BLOCKING` — critic 报告含 CRITICAL/HIGH,拒绝锁
 
-完整说明见 [spec §11](../docs/superpowers/specs/pm-template-skill-ization-design.md#十一错误码目录)。
+完整说明见上文"## 关键约束"段与各 skill 自身的错误处理段(每个 skill 内联)。
 
 ## 资产来源
 

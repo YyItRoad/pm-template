@@ -1,7 +1,7 @@
 # 标准技术栈规范
 
 > **版本: v1.0**(初版)
-> **配套**: [README.md](README.md) · [CHANGELOG.md](CHANGELOG.md) · 设计 spec [`docs/superpowers/specs/standard-tech-stack-design.md`](../superpowers/specs/standard-tech-stack-design.md)
+> **配套**: [README.md](README.md) · [CHANGELOG.md](CHANGELOG.md)
 > **作用**: 把"web 应用 + 后台管理 SPA + 关系数据库"型项目的高频技术选型沉淀为可复用规范,新项目启动直接套用,不再每次重新选
 
 ---

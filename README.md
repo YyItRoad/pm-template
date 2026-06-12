@@ -22,8 +22,8 @@
 |---|---|
 | 流程使用指南 | [`docs/process/README.md`](docs/process/README.md) |
 | 标准技术栈规范 | [`docs/process/tech_stack.md`](docs/process/tech_stack.md) |
-| 设计 spec | [`docs/superpowers/specs/standard-process-template-design.md`](docs/superpowers/specs/standard-process-template-design.md) / [`standard-tech-stack-design.md`](docs/superpowers/specs/standard-tech-stack-design.md) / [`pm-template-skill-ization-design.md`](docs/superpowers/specs/pm-template-skill-ization-design.md) |
-| 13 skills 列表与职责 | [`.claude/skills/README.md`](.claude/skills/README.md) |
+| 14 skills 列表与职责 | [`.claude/skills/README.md`](.claude/skills/README.md) |
+| 交付清单(ship / skip) | [`MANIFEST.json`](MANIFEST.json) |
 
 ## 作为 GitHub Template 使用
 

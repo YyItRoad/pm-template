@@ -23,6 +23,7 @@
   },
   "usage": {
     "human": "克隆本仓库后,看 ship/skip 两段决定保留什么/删什么。",
-    "tooling": "未来 /adopt skill 读本文件,自动 copy ship 列表 + rm skip 列表,实现一键接入现有项目。"
+    "human_existing": "已有项目接入:用 `docs/process/README.md` B 段 4 步(cp ship 资产 + 初始化 STATE.md),不通过 skill/subtree。",
+    "tooling": "(暂未提供自动化工具;`ship` 字段设计为未来 /adopt skill 可读)"
   }
 }

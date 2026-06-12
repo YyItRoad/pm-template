@@ -49,13 +49,43 @@ docs/process/
 
 详见 [tech_stack.md](tech_stack.md) §1 锁层级说明。
 
-## 怎么用(5 步)
+## 怎么用
+
+### A. 新项目(5 步)
 
 1. **复制模板**: 把 `templates/0X_*.md` 复制到 `docs/0X_*.md`
 2. **让 AI 填空**: 告诉 AI "请按 `docs/process/templates/0X_*.md` 填空,主题是 <项目>"
 3. **跑 critic 自审**: 把 `critics/0X_*.md` 完整内容复制 + 加 "<artifact_path> 跑自审"
 4. **报告存档**: critic 报告**必须**存到 `critics/reports/0X_<phase>_<YYYY-MM-DD>.md`
 5. **签字锁**: 勾完 DoD 全部 + 在 artifact 末尾 §N+1 签字 + 更新 `STATE.md` 状态
+
+### B. 现有项目接入(4 步)
+
+> 适用场景:已有项目想用 pm-template 流程(中途接盘 / 部分接入 / 重启流程)。
+> 假设 `pm-template/` 与 `adopt-ee/` 是同级目录。
+
+```bash
+# 1. 复制 skills(.claude/ 下可能有别的 skill,用 -n 避免覆盖)
+cp -rn pm-template/.claude/skills/ adopt-ee/.claude/skills/
+
+# 2. 复制流程资产(模板/critic/DoD/tech_stack,基本不冲突)
+cp -rn pm-template/docs/process/ adopt-ee/docs/process/
+
+# 3. 生成 runtime STATE.md(从模板复制,5 phase 状态全 [ ])
+cp pm-template/docs/process/STATE.md adopt-ee/docs/STATE.md
+
+# 4. 记录 pm-template 版本(可选,日后升级用)
+echo "adopted from pm-template @ $(git -C pm-template rev-parse --short HEAD) on $(date -I)" \
+  > adopt-ee/docs/ADOPT_NOTE.md
+```
+
+**注意事项**:
+
+- **README.md / LICENSE 不在 2 目录里** — adopt-ee 几乎一定有,跳过
+- **MANIFEST.json** — 可选 copy 到 adopt-ee 根目录,记录"用了 pm-template 哪些资产"
+- **冲突处理**:`-n` = no-clobber,同名文件不覆盖。若 `.claude/skills/` 已有同名 skill,手动合并
+- **STATE.md 全 `[ ]`** — 从 phase 0 重跑,phase 0 §2.5 改为"承认现实"签字(读已有代码记录已选型,不再重选)
+- **未来升级 pm-template** — 重新跑这 4 步,`-n` 保护你手动改过的内容
 
 ## 流转状态
 
@@ -99,11 +129,11 @@ docs/process/
 - 4 层 + 单一职责是**机械约束**,让 AI 不能自由发挥
 - 详见 [`tech_stack.md`](tech_stack.md) §5
 
-### 4. 为什么 13 skill?不"手写流程"
+### 4. 为什么 14 skill?不"手写流程"
 
 - 文档是死的,LLM 不照着读 → 流程等于没流程
-- 13 skill 把"5 phase 流程 + 状态机 + DoD + critic"封装成 Claude Code 可识别的入口
-- 1 入口(new-project)+ 5 phase + 4 辅助(state/critic/dod-check/unlock)+ 4 维护期(change/decision/release/audit)= 14(注:14 是 v0.4.0 后)
+- 14 skill 把"5 phase 流程 + 状态机 + DoD + critic"封装成 Claude Code 可识别的入口
+- 1 入口(new-project)+ 5 phase + 4 辅助(state/critic/dod-check/unlock)+ 4 维护期(change/decision/release/audit)= 14
 - 状态机 6 状态(`[ ]`/`[~]`/`[x]`/`[UNLOCKED]`/`[SKIP]`/`[x] LEGACY`)覆盖完整生命周期
 
 ### 5. 为什么 5 类门(状态机 / 签字 / DoD / critic / 硬 grep)?
